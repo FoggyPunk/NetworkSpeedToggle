@@ -5,6 +5,8 @@
 
 A lightweight, invisible WPF system tray application to instantly toggle your Ethernet adapter speed between 1.0 Gbps and 2.5 Gbps with a simple double-click.
 
+![networkspeedtoggle](https://github.com/user-attachments/assets/b5c99ddc-ed00-420d-b214-cc1c0711836d)
+
 ## The Story Behind This Project
 This is an amateur, open-source project born out of a specific frustration in the cloud gaming community. When using game streaming software like **Moonlight** and **Sunshine**, a known issue occurs if the host PC and the client have mismatched Ethernet link speeds (e.g., the Host is connected at 2.5 Gbps while the Client/Switch is at 1 Gbps). 
 
@@ -35,3 +37,4 @@ If this tool helped you fix your Moonlight streaming stutters or made your netwo
 ## License
 
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
+
