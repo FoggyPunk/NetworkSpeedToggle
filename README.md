@@ -27,8 +27,9 @@ The most effective workaround is to manually throttle the Host PC's Ethernet ada
 ## Support the Project
 If this tool helped you fix your Moonlight streaming stutters or made your network management easier, consider buying me a coffee! ☕
 
-[![Donate with PayPal](https://img.shields.io/badge/Donate-PayPal-blue.svg)](https://paypal.me/foggypunk) *
+[![Donate with PayPal](https://img.shields.io/badge/Donate-PayPal-blue.svg)](https://paypal.me/foggypunk)
 
 ## License
 MIT License
+
 
