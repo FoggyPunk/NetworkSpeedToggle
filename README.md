@@ -35,5 +35,3 @@ If this tool helped you fix your Moonlight streaming stutters or made your netwo
 ## License
 
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
-
-MIT License
