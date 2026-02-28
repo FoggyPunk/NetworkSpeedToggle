@@ -22,9 +22,11 @@ A lightweight, invisible WPF system tray application to instantly toggle your Et
 
 Go to the \*\*Releases\*\* page on the right side of this GitHub repository and download the latest `NetworkSpeedToggle\_Installer.exe`.
 
+## Support the Project
+If this tool helped you manage your network speed more easily, consider buying me a coffee! ☕
 
+[![Donate with PayPal](https://img.shields.io/badge/Donate-PayPal-blue.svg)](https://paypal.me/foggypunk)
 
 \## License
 
 MIT License
-
