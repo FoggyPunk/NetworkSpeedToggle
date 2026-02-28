@@ -5,7 +5,7 @@
 
 A lightweight WPF system tray application to instantly toggle your Ethernet adapter speed between 1.0 Gbps and 2.5 Gbps with a simple double-click, completely bypassing Windows menus.
 
-![networkspeedtoggle](https://github.com/user-attachments/assets/40cdd7b4-b2e0-4ff5-9047-cbadd7540ecc)
+<img width="509" height="442" alt="networkspeedtoogle" src="https://github.com/user-attachments/assets/4021747e-22c3-4904-9008-c1945df5cb5e" />
 
 ## 🌟 What's New in Version 1.1
 - **Smart Settings UI:** A brand new configuration window to dynamically detect your physical network adapters and select the desired speeds.
@@ -45,3 +45,4 @@ If this tool helped you fix your Moonlight streaming stutters or made your netwo
 ## License
 
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
+
