@@ -1,5 +1,8 @@
 # Network Speed Toggle
 
+![Platform](https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-blue.svg)
+![Framework](https://img.shields.io/badge/Framework-.NET%2010.0-purple.svg)
+
 A lightweight, invisible WPF system tray application to instantly toggle your Ethernet adapter speed between 1.0 Gbps and 2.5 Gbps with a simple double-click.
 
 ## The Story Behind This Project
@@ -30,6 +33,7 @@ If this tool helped you fix your Moonlight streaming stutters or made your netwo
 [![Donate with PayPal](https://img.shields.io/badge/Donate-PayPal-blue.svg)](https://paypal.me/foggypunk)
 
 ## License
+
+![License](https://img.shields.io/badge/License-MIT-green.svg)
+
 MIT License
-
-
