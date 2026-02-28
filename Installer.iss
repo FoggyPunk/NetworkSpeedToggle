@@ -1,48 +1,50 @@
-#define MyAppName "Network Speed Toggle"
-#define MyAppVersion "1.1"
-#define MyAppPublisher "FoggyPunk"
-#define MyAppExeName "NetworkSpeedToggle.exe"
-
 [Setup]
-AppId={{D37D0ED6-5E8D-4131-B2C1-30A5840AC97B}
-AppName={#MyAppName}
-AppVersion={#MyAppVersion}
-AppPublisher={#MyAppPublisher}
-DefaultDirName={autopf}\{#MyAppName}
-DisableProgramGroupPage=yes
+AppName=Network Speed Toggle
+AppVersion=1.1
+AppPublisher=FoggyPunk
+DefaultDirName={autopf}\NetworkSpeedToggle
+DefaultGroupName=Network Speed Toggle
+InfoBeforeFile=C:\Users\marce\OneDrive\Documents\Streaming\Progetto_GitHub_Network\changelog.txt
 
-InfoBeforeFile="C:\Users\marce\OneDrive\Documents\Streaming\Progetto_GitHub_Network\changelog.txt"
-OutputDir=.\InstallerOutput
-OutputBaseFilename=NetworkSpeedToggle_1.1_Setup
+; --- ICONS ---
+SetupIconFile=C:\Users\marce\source\repos\NetworkSpeedToggle\NetworkSpeedToggle\bin\Release\net10.0-windows\Resources\25g.ico
+WizardSmallImageFile=C:\Users\marce\source\repos\NetworkSpeedToggle\NetworkSpeedToggle\bin\Release\net10.0-windows\Resources\25g.bmp
+UninstallDisplayIcon={app}\Resources\25g.ico
 
-SetupIconFile="C:\Users\marce\source\repos\NetworkSpeedToggle\NetworkSpeedToggle\Resources\25g.ico"
+; --- UI TWEAKS ---
+AllowNoIcons=yes
+DirExistsWarning=no
+CloseApplications=yes
 
-; CHANGED: We now point EXACTLY to the physical .ico file inside the installation folder
-UninstallDisplayIcon="{app}\Resources\25g.ico"
-
-Compression=lzma
+Compression=lzma2
 SolidCompression=yes
-WizardStyle=modern
+OutputDir=userdocs:Inno Setup Output
+OutputBaseFilename=NetworkSpeedToggle_1.1_Installer
 PrivilegesRequired=admin
-
-[Languages]
-Name: "english"; MessagesFile: "compiler:Default.isl"
+WizardStyle=modern
 
 [Tasks]
-Name: "startmenuicon"; Description: "Create a Start Menu shortcut"; GroupDescription: "Shortcuts:"
-Name: "startup"; Description: "Start automatically with Windows (Hidden Task)"; GroupDescription: "Windows Startup:"
+Name: "autostart"; Description: "Start Network Speed Toggle automatically when Windows starts"; GroupDescription: "Auto-start Options:"; Flags: checkedonce
 
 [Files]
-Source: "C:\Users\marce\source\repos\NetworkSpeedToggle\NetworkSpeedToggle\bin\Release\net10.0-windows\*"; DestDir: "{app}"; Excludes: "config.json"; Flags: ignoreversion recursesubdirs
-; NEW: Explicitly force the copy of the icon to the Resources folder just to be absolutely certain it is there
-Source: "C:\Users\marce\source\repos\NetworkSpeedToggle\NetworkSpeedToggle\Resources\25g.ico"; DestDir: "{app}\Resources"; Flags: ignoreversion
+Source: "C:\Users\marce\source\repos\NetworkSpeedToggle\NetworkSpeedToggle\bin\Release\net10.0-windows\NetworkSpeedToggle.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\marce\source\repos\NetworkSpeedToggle\NetworkSpeedToggle\bin\Release\net10.0-windows\*.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\marce\source\repos\NetworkSpeedToggle\NetworkSpeedToggle\bin\Release\net10.0-windows\*.json"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\marce\source\repos\NetworkSpeedToggle\NetworkSpeedToggle\bin\Release\net10.0-windows\Resources\*"; DestDir: "{app}\Resources"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\Users\marce\source\repos\NetworkSpeedToggle\NetworkSpeedToggle\bin\Release\net10.0-windows\runtimes\*"; DestDir: "{app}\runtimes"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\Resources\25g.ico"; Tasks: startmenuicon
+Name: "{group}\Network Speed Toggle"; Filename: "{app}\NetworkSpeedToggle.exe"; IconFilename: "{app}\Resources\25g.ico"
+Name: "{commonstartup}\Network Speed Toggle"; Filename: "{app}\NetworkSpeedToggle.exe"; IconFilename: "{app}\Resources\25g.ico"; Tasks: autostart
 
 [Run]
-Filename: "schtasks.exe"; Parameters: "/create /tn ""{#MyAppName}"" /tr ""'""{app}\{#MyAppExeName}""'"" /sc onlogon /rl highest /f"; Flags: runhidden; Tasks: startup
-Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\NetworkSpeedToggle.exe"; Description: "Launch Network Speed Toggle now"; Flags: nowait postinstall runascurrentuser
 
 [UninstallRun]
-Filename: "schtasks.exe"; Parameters: "/delete /tn ""{#MyAppName}"" /f"; Flags: runhidden
+Filename: "taskkill.exe"; Parameters: "/F /IM NetworkSpeedToggle.exe /T"; Flags: runhidden; RunOnceId: "KillApp"
+
+[UninstallDelete]
+Type: files; Name: "{app}\config.json"
+Type: dirifempty; Name: "{app}\Resources"
+Type: dirifempty; Name: "{app}\runtimes"
+Type: dirifempty; Name: "{app}"
