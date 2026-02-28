@@ -3,7 +3,7 @@
 ![Platform](https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-blue.svg)
 ![Framework](https://img.shields.io/badge/Framework-.NET%2010.0-purple.svg)
 
-A lightweight WPF system tray application to instantly toggle your Ethernet adapter speed between 1.0 Gbps and 2.5 Gbps with a simple double-click, completely bypassing Windows menus.
+Lightweight WPF system tray app that lets you **switch between ALL supported Ethernet speeds** (100/1000/2.5G/5G/10G) with one click - no more manual adapter settings.
 
 <img width="381" height="331" alt="networkspeedtoogle" src="https://github.com/user-attachments/assets/953a28da-1dcc-4d8c-8adb-cc7b9ee83883" />
 
@@ -13,6 +13,8 @@ A lightweight WPF system tray application to instantly toggle your Ethernet adap
 - **Toast Notifications:** Added native Windows notifications to confirm when the router/switch handshake is successfully completed.
 - **Driver Bypass:** Automatically detects and bypasses Realtek/Intel driver localization limitations when setting link speeds.
 - **UAC On-Demand:** The app now runs completely silently in the background, only requesting Admin Privileges exactly when you apply a new speed.
+
+🎯 **Perfect for Moonlight/Sunshine streaming** - choose 1 Gbps for stability or max speed for throughput.
 
 ## The Story Behind This Project
 This is an amateur, open-source project born out of a specific frustration in the cloud gaming community. When using game streaming software like **Moonlight** and **Sunshine**, a known issue occurs if the host PC and the client have mismatched Ethernet link speeds (e.g., the Host is connected at 2.5 Gbps while the Client/Switch is at 1 Gbps). 
@@ -45,5 +47,3 @@ If this tool helped you fix your Moonlight streaming stutters or made your netwo
 ## License
 
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
-
-
