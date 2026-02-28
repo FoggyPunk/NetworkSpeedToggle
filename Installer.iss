@@ -1,83 +1,48 @@
+#define MyAppName "Network Speed Toggle"
+#define MyAppVersion "1.1"
+#define MyAppPublisher "FoggyPunk"
+#define MyAppExeName "NetworkSpeedToggle.exe"
+
 [Setup]
-AppName=Network Speed Toggle
-AppVersion=1.0
-AppPublisher=FoggyPunk
-DefaultDirName={autopf}\NetworkSpeedToggle
-DefaultGroupName=Network Speed Toggle
+AppId={{D37D0ED6-5E8D-4131-B2C1-30A5840AC97B}
+AppName={#MyAppName}
+AppVersion={#MyAppVersion}
+AppPublisher={#MyAppPublisher}
+DefaultDirName={autopf}\{#MyAppName}
+DisableProgramGroupPage=yes
 
-; --- ICONS ---
-SetupIconFile=C:\users\marce\source\repos\NetworkSpeedToggle\NetworkSpeedToggle\bin\Release\net10.0-windows\Resources\25g.ico
-WizardSmallImageFile=C:\users\marce\source\repos\NetworkSpeedToggle\NetworkSpeedToggle\bin\Release\net10.0-windows\Resources\25g.bmp
-UninstallDisplayIcon={app}\Resources\25g.ico
+InfoBeforeFile="C:\Users\marce\OneDrive\Documents\Streaming\Progetto_GitHub_Network\changelog.txt"
+OutputDir=.\InstallerOutput
+OutputBaseFilename=NetworkSpeedToggle_1.1_Setup
 
-; --- UI TWEAKS ---
-AllowNoIcons=yes
-; Disabilita il fastidioso avviso "La cartella esiste gia'" quando reinstalli/aggiorni
-DirExistsWarning=no
-CloseApplications=yes
+SetupIconFile="C:\Users\marce\source\repos\NetworkSpeedToggle\NetworkSpeedToggle\Resources\25g.ico"
 
-Compression=lzma2
+; CHANGED: We now point EXACTLY to the physical .ico file inside the installation folder
+UninstallDisplayIcon="{app}\Resources\25g.ico"
+
+Compression=lzma
 SolidCompression=yes
-OutputDir=userdocs:Inno Setup Output
-OutputBaseFilename=NetworkSpeedToggle_Installer
-PrivilegesRequired=admin
 WizardStyle=modern
+PrivilegesRequired=admin
+
+[Languages]
+Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
-Name: "autostart"; Description: "Start Network Speed Toggle automatically when Windows starts"; GroupDescription: "Auto-start Options:"; Flags: checkedonce
+Name: "startmenuicon"; Description: "Create a Start Menu shortcut"; GroupDescription: "Shortcuts:"
+Name: "startup"; Description: "Start automatically with Windows (Hidden Task)"; GroupDescription: "Windows Startup:"
 
 [Files]
-Source: "C:\users\marce\source\repos\NetworkSpeedToggle\NetworkSpeedToggle\bin\Release\net10.0-windows\NetworkSpeedToggle.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\users\marce\source\repos\NetworkSpeedToggle\NetworkSpeedToggle\bin\Release\net10.0-windows\*.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\users\marce\source\repos\NetworkSpeedToggle\NetworkSpeedToggle\bin\Release\net10.0-windows\*.json"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\users\marce\source\repos\NetworkSpeedToggle\NetworkSpeedToggle\bin\Release\net10.0-windows\Resources\*"; DestDir: "{app}\Resources"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "C:\users\marce\source\repos\NetworkSpeedToggle\NetworkSpeedToggle\bin\Release\net10.0-windows\runtimes\*"; DestDir: "{app}\runtimes"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\Users\marce\source\repos\NetworkSpeedToggle\NetworkSpeedToggle\bin\Release\net10.0-windows\*"; DestDir: "{app}"; Excludes: "config.json"; Flags: ignoreversion recursesubdirs
+; NEW: Explicitly force the copy of the icon to the Resources folder just to be absolutely certain it is there
+Source: "C:\Users\marce\source\repos\NetworkSpeedToggle\NetworkSpeedToggle\Resources\25g.ico"; DestDir: "{app}\Resources"; Flags: ignoreversion
 
 [Icons]
-Name: "{group}\Network Speed Toggle"; Filename: "{app}\NetworkSpeedToggle.exe"; IconFilename: "{app}\Resources\25g.ico"
-Name: "{commonstartup}\Network Speed Toggle"; Filename: "{app}\NetworkSpeedToggle.exe"; IconFilename: "{app}\Resources\25g.ico"; Tasks: autostart
+Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\Resources\25g.ico"; Tasks: startmenuicon
 
 [Run]
-Filename: "{app}\NetworkSpeedToggle.exe"; Description: "Launch Network Speed Toggle now"; Flags: nowait postinstall runascurrentuser
+Filename: "schtasks.exe"; Parameters: "/create /tn ""{#MyAppName}"" /tr ""'""{app}\{#MyAppExeName}""'"" /sc onlogon /rl highest /f"; Flags: runhidden; Tasks: startup
+Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
-; Uccide il processo per sbloccare i file e rimuovere la tray icon
-Filename: "taskkill.exe"; Parameters: "/F /IM NetworkSpeedToggle.exe /T"; Flags: runhidden; RunOnceId: "KillApp"
-
-[UninstallDelete]
-; ELIMINAZIONE PROFONDA: Rimuove file generati dinamicamente (come config.json) e forza la cancellazione dell'intera cartella
-Type: files; Name: "{app}\config.json"
-Type: dirifempty; Name: "{app}\Resources"
-Type: dirifempty; Name: "{app}\runtimes"
-Type: dirifempty; Name: "{app}"
-
-[Code]
-var
-  AdapterPage: TInputQueryWizardPage;
-
-procedure InitializeWizard;
-begin
-  AdapterPage := CreateInputQueryPage(wpSelectDir,
-    'Network Adapter Configuration',
-    'Specify the network adapter you want to control',
-    'To find your exact adapter name in Windows:' + #13#10 +
-    '1. Press the Windows Key + R' + #13#10 +
-    '2. Type "ncpa.cpl" and press Enter' + #13#10 +
-    '3. A window will open showing your network connections.' + #13#10 +
-    '4. Look for your active cable connection (usually named "Ethernet" or "Ethernet 2").' + #13#10 + #13#10 +
-    'Please type that exact name below (it is case-sensitive):');
-
-  AdapterPage.Add('Adapter Name:', False);
-  AdapterPage.Values[0] := 'Ethernet';
-end;
-
-procedure CurStepChanged(CurStep: TSetupStep);
-var
-  JsonContent: String;
-begin
-  if CurStep = ssPostInstall then
-  begin
-    JsonContent := '{' + #13#10 + '  "NetworkAdapterName": "' + AdapterPage.Values[0] + '"' + #13#10 + '}';
-    SaveStringToFile(ExpandConstant('{app}\config.json'), JsonContent, False);
-  end;
-end;
+Filename: "schtasks.exe"; Parameters: "/delete /tn ""{#MyAppName}"" /f"; Flags: runhidden

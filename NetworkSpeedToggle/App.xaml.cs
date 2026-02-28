@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text.Json;
+using System.Threading.Tasks;
 using System.Windows;
 using Hardcodet.Wpf.TaskbarNotification;
-using System.Management;
-using System.Threading.Tasks;
 
 [assembly: System.Runtime.Versioning.SupportedOSPlatform("windows")]
 
@@ -14,25 +14,23 @@ namespace NetworkSpeedToggle
     public partial class App : Application
     {
         private TaskbarIcon tb = default!;
-        private string adapterName = "Ethernet"; // Default adapter name
+        private string adapterName = "Ethernet";
         private readonly string icon1GPath = @"Resources\1g.ico";
         private readonly string icon25GPath = @"Resources\25g.ico";
+
+        private SettingsWindow? settingsWindow = null;
 
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-
-            // CRITICAL FIX: Prevent the application from shutting down when the Context Menu closes!
             Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
-            // Load settings from config.json
             LoadConfig();
 
-            // Initialize the hidden system tray icon
             tb = (TaskbarIcon)FindResource("MyNotifyIcon")!;
 
-            // Set the initial icon based on the actual network adapter speed
-            UpdateIconBasedOnSpeed();
+            // False: no popup on PC startup
+            UpdateIconBasedOnSpeed(false);
         }
 
         private void LoadConfig()
@@ -52,129 +50,144 @@ namespace NetworkSpeedToggle
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Failed to read config.json. Using default 'Ethernet'.\nError: {ex.Message}",
-                                "Configuration Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
+            catch { }
         }
 
-        private void UpdateIconBasedOnSpeed()
+        private bool UpdateIconBasedOnSpeed(bool showNotification = false)
         {
             try
             {
-                // Use WMI to fetch the current duplex speed of the specified Ethernet adapter
-                string query = $"SELECT * FROM MSft_NetAdapterAdvancedPropertySettingData WHERE Name='{adapterName}' AND RegistryKeyword='*SpeedDuplex'";
-                using (var searcher = new ManagementObjectSearcher(@"root\StandardCimv2", query))
+                long speedBps = 0;
+
+                // We use the native .NET NetworkInterface which is always updated in real time
+                var ni = NetworkInterface.GetAllNetworkInterfaces()
+                            .FirstOrDefault(n => n.Name.Equals(adapterName, StringComparison.OrdinalIgnoreCase));
+
+                if (ni != null && ni.OperationalStatus == OperationalStatus.Up)
                 {
-                    string currentValue = "1.0 Gbps"; // Assume 1 Gbps if reading fails
-
-                    foreach (ManagementObject obj in searcher.Get())
-                    {
-                        currentValue = obj["DisplayValue"]?.ToString() ?? "1.0 Gbps";
-                    }
-
-                    // Update the tray icon and tooltip based on the returned value
-                    if (currentValue.Contains("2.5"))
-                    {
-                        tb.Icon = new System.Drawing.Icon(icon25GPath);
-                        tb.ToolTipText = $"Network: {adapterName}\nCurrent Speed: 2.5 Gbps\n(Double-click to toggle)";
-                    }
-                    else
-                    {
-                        tb.Icon = new System.Drawing.Icon(icon1GPath);
-                        tb.ToolTipText = $"Network: {adapterName}\nCurrent Speed: 1.0 Gbps\n(Double-click to toggle)";
-                    }
+                    speedBps = ni.Speed; // Returns the true Link Speed in bits per second
                 }
+
+                string currentSpeedText = "";
+
+                if (speedBps <= 0)
+                {
+                    tb.Icon = new System.Drawing.Icon(icon1GPath);
+                    currentSpeedText = "Disconnected / Negotiating";
+                    tb.ToolTipText = $"Network: {adapterName}\nStatus: {currentSpeedText}";
+                    return false;
+                }
+                else if (speedBps >= 2500000000) // 2.5 Gbps or higher
+                {
+                    tb.Icon = new System.Drawing.Icon(icon25GPath);
+                    currentSpeedText = $"{(speedBps / 1000000000.0):0.##} Gbps";
+                    tb.ToolTipText = $"Network: {adapterName}\nCurrent Link Speed: {currentSpeedText}";
+                }
+                else // 1.0 Gbps or lower
+                {
+                    tb.Icon = new System.Drawing.Icon(icon1GPath);
+                    currentSpeedText = speedBps >= 1000000000
+                        ? $"{(speedBps / 1000000000.0):0.##} Gbps"
+                        : $"{(speedBps / 1000000.0):0.##} Mbps";
+                    tb.ToolTipText = $"Network: {adapterName}\nCurrent Link Speed: {currentSpeedText}";
+                }
+
+                if (showNotification)
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        tb.ShowBalloonTip("Network Speed Applied",
+                                          $"{adapterName} is now connected at {currentSpeedText}.",
+                                          BalloonIcon.Info);
+                    });
+                }
+
+                return true;
             }
             catch
             {
-                // Safety fallback in case the WMI query fails (e.g., adapter not found)
                 tb.Icon = new System.Drawing.Icon(icon1GPath);
-                tb.ToolTipText = "Network Speed Toggle\n(Status Unknown)";
+                tb.ToolTipText = "Network Speed Monitor\n(Status Unknown)";
+                return false;
             }
         }
 
-        private async Task ToggleSpeed()
+        // Main method to open Settings
+        private void OpenSettings()
         {
-            try
+            if (settingsWindow == null)
             {
-                // Set the icon tooltip to show it is working
-                Application.Current.Dispatcher.Invoke(() =>
+                settingsWindow = new SettingsWindow();
+
+                settingsWindow.Closed += async (s, args) =>
                 {
-                    tb.ToolTipText = "Applying new speed... please wait.";
-                });
+                    // Check if the user actually pressed "Apply" instead of the "X" button
+                    bool hasAppliedChanges = settingsWindow?.HasAppliedChanges == true;
+                    settingsWindow = null;
 
-                // Offload the heavy process to a background thread
-                await Task.Run(async () =>
-                {
-                    string psScript = $@"
-                        $Adapter = '{adapterName}'
-                        $Prop = Get-NetAdapterAdvancedProperty -Name $Adapter -RegistryKeyword '*SpeedDuplex' -ErrorAction SilentlyContinue
-                        if (-not $Prop) {{ exit }}
-                        $PropName = $Prop.DisplayName
-                        $Val1G = $Prop.ValidDisplayValues | Where-Object {{ $_ -match '1\.0 Gbps' -or $_ -match '1 Gbps' }} | Select-Object -First 1
-                        $Val2_5G = $Prop.ValidDisplayValues | Where-Object {{ $_ -match '2\.5 Gbps' }} | Select-Object -First 1
-                        $Current = $Prop.DisplayValue
-
-                        if ($Current -match '1\.0' -or $Current -match '1 ') {{
-                            Set-NetAdapterAdvancedProperty -Name $Adapter -DisplayName $PropName -DisplayValue $Val2_5G
-                        }} else {{
-                            Set-NetAdapterAdvancedProperty -Name $Adapter -DisplayName $PropName -DisplayValue $Val1G
-                        }}";
-
-                    var processInfo = new ProcessStartInfo
+                    if (hasAppliedChanges)
                     {
-                        FileName = "powershell.exe",
-                        Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{psScript}\"",
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true,
-                        UseShellExecute = false,
-                        CreateNoWindow = true // Prevents the console window from flashing
-                    };
+                        LoadConfig();
 
-                    using (var process = Process.Start(processInfo))
-                    {
-                        if (process != null)
+                        Application.Current.Dispatcher.Invoke(() => { tb.ToolTipText = "Renegotiating link speed... please wait."; });
+
+                        // Give the driver time to actually shut down the connection
+                        await Task.Delay(3000);
+
+                        int attempts = 0;
+                        bool isConnected = false;
+
+                        // Polling: wait up to 15 seconds for the link to come back up
+                        while (attempts < 15)
                         {
-                            await process.WaitForExitAsync();
+                            isConnected = UpdateIconBasedOnSpeed(false);
+                            if (isConnected) break;
+
+                            await Task.Delay(1000);
+                            attempts++;
+                        }
+
+                        if (isConnected)
+                        {
+                            UpdateIconBasedOnSpeed(true);
+                        }
+                        else
+                        {
+                            Application.Current.Dispatcher.Invoke(() =>
+                            {
+                                tb.ShowBalloonTip("Renegotiation Timeout",
+                                                  $"The adapter '{adapterName}' took too long to reconnect. Please check the cable or adapter status.",
+                                                  BalloonIcon.Warning);
+                            });
                         }
                     }
-                });
+                };
 
-                // Refresh the tray icon on the UI thread once the background task is done
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    UpdateIconBasedOnSpeed();
-                });
+                settingsWindow.Show();
             }
-            catch (Exception ex)
+            else
             {
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    MessageBox.Show($"Error during speed switch:\n{ex.Message}", "Action Failed", MessageBoxButton.OK, MessageBoxImage.Error);
-                });
+                if (settingsWindow.WindowState == WindowState.Minimized)
+                    settingsWindow.WindowState = WindowState.Normal;
+                settingsWindow.Activate();
             }
         }
 
-        private async void TrayIcon_DoubleClick(object sender, RoutedEventArgs e)
+        // Double Click = Open Settings
+        private void TaskbarIcon_TrayMouseDoubleClick(object sender, RoutedEventArgs e)
         {
-            await ToggleSpeed();
+            OpenSettings();
         }
 
-        private async void MenuToggle_Click(object sender, RoutedEventArgs e)
+        // Right Click -> Settings = Open Settings
+        private void MenuSettings_Click(object sender, RoutedEventArgs e)
         {
-            await ToggleSpeed();
+            OpenSettings();
         }
 
         private void MenuExit_Click(object sender, RoutedEventArgs e)
         {
-            // Clean up the icon from the system tray before shutting down the application
-            if (tb != null)
-            {
-                tb.Dispose();
-            }
-            // Explicitly shut down the application now
+            if (tb != null) tb.Dispose();
             Application.Current.Shutdown();
         }
     }

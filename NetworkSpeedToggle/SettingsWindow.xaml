@@ -1,0 +1,48 @@
+﻿<Window x:Class="NetworkSpeedToggle.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Network Speed Monitor - Settings" 
+        Icon="Resources\25g.ico"
+        Height="360" Width="420"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Background="#1E1E1E"
+        Foreground="White"
+        FontFamily="Segoe UI">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Adapter Section -->
+        <TextBlock Grid.Row="0" Text="1. Select Network Adapter" FontSize="16" FontWeight="Bold" Margin="0,0,0,5"/>
+        <TextBlock Grid.Row="1" Text="Choose the adapter you want to control:" 
+                   Foreground="#AAAAAA" TextWrapping="Wrap" Margin="0,0,0,10"/>
+        <ComboBox x:Name="CmbAdapters" Grid.Row="2" Height="30" Margin="0,0,0,20"
+                  Background="#333333" Foreground="Black" FontSize="14" Padding="5" 
+                  SelectionChanged="CmbAdapters_SelectionChanged"/>
+
+        <!-- Speeds Section -->
+        <TextBlock Grid.Row="3" Text="2. Select Link Speed / Duplex" FontSize="16" FontWeight="Bold" Margin="0,0,0,5"/>
+        <TextBlock Grid.Row="4" Text="Choose the connection speed to apply:" 
+                   Foreground="#AAAAAA" TextWrapping="Wrap" Margin="0,0,0,10"/>
+        <ComboBox x:Name="CmbSpeeds" Grid.Row="5" Height="30" VerticalAlignment="Top"
+                  Background="#333333" Foreground="Black" FontSize="14" Padding="5"/>
+
+        <!-- Action Buttons -->
+        <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
+            <Button x:Name="BtnRefresh" Content="Refresh Adapters" Width="110" Height="30" Margin="0,0,10,0" 
+                    Background="#333333" Foreground="White" BorderBrush="#555555" Click="BtnRefresh_Click"/>
+
+            <Button x:Name="BtnSave" Content="Apply Settings" Width="110" Height="30" 
+                    Background="#0078D7" Foreground="White" BorderBrush="Transparent" Click="BtnSave_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

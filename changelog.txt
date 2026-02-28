@@ -1,0 +1,21 @@
+==========================================
+ NETWORK SPEED TOGGLE - CHANGELOG
+==========================================
+
+Version 1.1 - The "Smart Update"
+------------------------------------------
+NEW FEATURES:
+- Added a full Graphic Settings UI (Accessible via double-click or tray menu).
+- Automatic detection of physical Ethernet adapters (filters out virtual and Wi-Fi ones).
+- Automatic detection and bypass of driver limitations for setting Link Speeds.
+- Replaced double-click behavior: now opens the Settings Control Panel.
+- Added native Windows Toast Notifications to confirm network renegotiation.
+- Implemented an intelligent polling system that waits for the router handshake to finish before updating the icon.
+- Read real-time link speed using kernel-level .NET APIs instead of WMI for 100% accuracy.
+
+Version 1.0 - Initial Release
+------------------------------------------
+- Initial release.
+- Allows switching the network adapter between 1.0 Gbps and 2.5 Gbps.
+- System Tray Icon presence (1G and 2.5G indicators).
+- Hidden Scheduled Task installation for UAC-free Windows boot startup.
