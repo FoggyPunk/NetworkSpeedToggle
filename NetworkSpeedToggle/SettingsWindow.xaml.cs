@@ -28,7 +28,7 @@ namespace NetworkSpeedToggle
         public SettingsWindow()
         {
             InitializeComponent();
-            this.Icon = new System.Windows.Media.Imaging.BitmapImage(new Uri(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\25g.ico")));
+            this.Icon = System.Windows.Media.Imaging.BitmapFrame.Create(new Uri("pack://application:,,,/Resources/25g.ico", UriKind.Absolute));
             string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             string appFolder = Path.Combine(appDataPath, "NetworkSpeedToggle");
 
