@@ -4,7 +4,8 @@
 
 Lightweight WPF system tray app that lets you **switch between ALL supported Ethernet speeds** (100/1000/2.5G/5G/10G) with one click - no more manual adapter settings.
 
-![networkspeedtoggle](https://github.com/user-attachments/assets/cfcc2c9b-6ecc-4304-a8fc-03d70abd6c3c)
+![networkspeedtoggle](https://github.com/user-attachments/assets/cfcc2c9b-6ecc-4304-a8fc-03d70abd6c3c)  ![networkspeedtoggledark](https://github.com/user-attachments/assets/5254ddee-cc30-44ef-bfda-15ebffbb7511)
+
 
 ## 🌟 What's New in Version 1.2
 - **Real-time speed indicator:** The Settings window now shows your current link speed live.
@@ -49,3 +50,4 @@ If this tool helped you fix your Moonlight streaming stutters or made your netwo
 
 ## License
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
+
