@@ -4,6 +4,8 @@
 
 Lightweight WPF system tray app that lets you **switch between ALL supported Ethernet speeds** (100/1000/2.5G/5G/10G) with one click - no more manual adapter settings.
 
+> ⚠️ **Browser Warning:** When downloading the installer, Edge or Chrome may show a warning saying the file could be harmful. This is a **false positive** caused by the lack of a paid code-signing certificate — common for new open-source projects. Click **"Keep anyway"** (Edge) or **"Keep"** (Chrome) to proceed. The source code is fully available here for inspection.
+
 <table>
   <tr>
     <td><strong>Light Mode</strong></td>
@@ -15,7 +17,11 @@ Lightweight WPF system tray app that lets you **switch between ALL supported Eth
   </tr>
 </table>
 
-## 🌟 What's New in Version 1.2
+## 🌟 What's New in Version 1.2.1
+
+- **Self-contained build:** The .NET 10 runtime is now bundled inside the installer — no need to install .NET separately on the target machine.
+
+## What's New in Version 1.2
 - **Real-time speed indicator:** The Settings window now shows your current link speed live.
 - **Modern Windows 11 UI:** Rounded corners, clean layout, and a fully custom ComboBox design.
 - **Complete Dark/Light theme:** Theme switching now covers the title bar, dropdowns, and all UI elements.
@@ -46,7 +52,7 @@ The most effective workaround is to manually throttle the Host PC's Ethernet ada
 
 ## Installation & Usage
 1. Go to the **Releases** page on the right side of this GitHub repository.
-2. Download the latest `NetworkSpeedToggle_1.2_Installer.exe`.
+2. Download the latest `NetworkSpeedToggle_1.2.1_Installer.exe`.
 3. Run the installer (you can choose to enable Auto-Start on Windows startup).
 4. Once running, double-click the tray icon to open the **Settings** window.
 5. Select your Ethernet adapter from the dropdown, choose your desired speed, and click **Apply Settings**. The app will handle the rest!
@@ -58,5 +64,3 @@ If this tool helped you fix your Moonlight streaming stutters or made your netwo
 
 ## License
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
-
-
