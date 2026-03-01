@@ -1,9 +1,9 @@
 ; =====================================================
-; Network Speed Toggle v1.2 - GitHub Release Installer
+; Network Speed Toggle v1.2.1 - GitHub Release Installer
 ; =====================================================
 
 #define MyAppName "Network Speed Toggle"
-#define MyAppVersion "1.2"
+#define MyAppVersion "1.2.1"
 #define MyAppPublisher "FoggyPunk"
 #define MyAppExeName "NetworkSpeedToggle.exe"
 

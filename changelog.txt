@@ -2,6 +2,12 @@
  NETWORK SPEED TOGGLE - CHANGELOG
 ==========================================
 
+Version 1.2.1 - The "No Prerequisites" Update (01/03/2026)
+------------------------------------------
+🔧 IMPROVEMENTS:
+- Self-contained build: .NET 10 runtime is now bundled inside the installer
+  No need to install .NET separately on the target machine
+
 Version 1.2 - The "UI Update" (01/03/2026)
 ------------------------------------------
 ✨ NEW FEATURES:
