@@ -1,0 +1,46 @@
+==========================================
+ NETWORK SPEED TOGGLE - CHANGELOG
+==========================================
+
+Version 1.2.1 - The "No Prerequisites" Update (01/03/2026)
+------------------------------------------
+🔧 IMPROVEMENTS:
+- Upgraded to .NET 8 (LTS) for improved stability and broader Windows compatibility.
+- Self‑contained build now bundles the full .NET 8 runtime, removing all external prerequisites.
+- More reliable deployment thanks to the transition from .NET 10 preview to a supported LTS framework.
+
+Version 1.2 - The "UI Update" (01/03/2026)
+------------------------------------------
+✨ NEW FEATURES:
+• Real-time current speed indicator
+• Modern Windows 11 UI with rounded corners
+• Complete Dark/Light theme (title bar + dropdowns) 
+• Automatic Windows theme color detection
+
+🔧 IMPROVEMENTS:
+• Physical adapters only (no filters, VPNs)
+• Persistent config (remembers adapter + theme)
+
+------------------------------------------
+Version 1.1 - The "Smart Update" (28/02/2026)
+------------------------------------------
+✨ NEW FEATURES:
+• Full Graphic Settings UI (double-click or tray menu)
+• Automatic physical Ethernet adapter detection
+• Automatic driver limitation bypass for Link Speeds
+• Native Windows Toast Notifications for confirmation
+• Intelligent polling waits for router handshake
+• Real-time link speed reading via kernel APIs
+
+🔧 IMPROVEMENTS:
+• Replaced double-click toggle with Settings panel
+• Filters out virtual adapters, Wi-Fi, Bluetooth
+
+------------------------------------------
+Version 1.0 - Initial Release (28/02/2026)
+------------------------------------------
+✨ CORE FEATURES:
+• Switch between 1.0 Gbps ↔ 2.5 Gbps
+• System Tray icons (1G/2.5G indicators)  
+• UAC-free startup via hidden Scheduled Task
+• Fixes Moonlight/Sunshine streaming stutter
