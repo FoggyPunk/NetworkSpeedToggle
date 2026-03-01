@@ -16,7 +16,7 @@ DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 InfoBeforeFile=changelog.txt
 
-; --- ICONS (Generic - uses embedded app icons) ---
+; --- ICONS ---
 SetupIconFile=Resources\25g.ico
 WizardSmallImageFile=Resources\25g.bmp
 UninstallDisplayIcon={app}\{#MyAppExeName}
@@ -51,10 +51,11 @@ Name: "{commonstartup}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: 
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#MyAppName}}"; Flags: postinstall skipifsilent nowait
 
 [UninstallRun]
-Filename: "schtasks.exe"; Parameters: "/delete /tn ""{#MyAppName}"" /f"; Flags: runhidden
 Filename: "taskkill.exe"; Parameters: "/F /IM {#MyAppExeName} /T"; Flags: runhidden; RunOnceId: "KillApp"
+Filename: "schtasks.exe"; Parameters: "/delete /tn ""{#MyAppName}"" /f"; Flags: runhidden
 
 [UninstallDelete]
-Type: filesandordirs; Name: "{app}\config.json"
+Type: filesandordirs; Name: "{localappdata}\NetworkSpeedToggle\config.json"
+Type: dirifempty; Name: "{localappdata}\NetworkSpeedToggle"
 Type: dirifempty; Name: "{app}\Resources"
 Type: dirifempty; Name: "{app}"

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
@@ -20,6 +20,14 @@ namespace NetworkSpeedToggle
 
         private SettingsWindow? settingsWindow = null;
 
+        private string GetConfigPath()
+        {
+            string appFolder = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "NetworkSpeedToggle");
+            return Path.Combine(appFolder, "config.json");
+        }
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
@@ -37,9 +45,10 @@ namespace NetworkSpeedToggle
         {
             try
             {
-                if (File.Exists("config.json"))
+                string configPath = GetConfigPath();
+                if (File.Exists(configPath))
                 {
-                    string json = File.ReadAllText("config.json");
+                    string json = File.ReadAllText(configPath);
                     using (JsonDocument document = JsonDocument.Parse(json))
                     {
                         var root = document.RootElement;
