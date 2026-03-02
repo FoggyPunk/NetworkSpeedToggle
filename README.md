@@ -16,6 +16,7 @@ With **Version 2.0**, the project has evolved. It is no longer just a network to
 
 ## ✨ What's New in Version 2.0
 - **Total Rebrand:** New name, new spirit, and a fresh modern icon.
+- **Streaming Mode:** Automatically throttles network to 1.0 Gbps on activation and restores your previous speed when disabled.
 - **HDR Toggle:** Easily enable or disable HDR on your monitor with one click directly from the tray (essential for streaming to non-HDR devices).
 - **Hardware Monitor:** Instantly view current resolution, refresh rate, and your installed GPU model.
 - **Intelligent Tooltips:** Hover over the tray icon to immediately understand your network and system status.
