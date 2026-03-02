@@ -15,8 +15,8 @@ namespace NetworkSpeedToggle
     {
         private TaskbarIcon tb = default!;
         private string adapterName = "Ethernet";
-        private readonly string icon1GPath = @"Resources\1g.ico";
-        private readonly string icon25GPath = @"Resources\25g.ico";
+        private readonly string icon1GPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\1g.ico");
+        private readonly string icon25GPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\25g.ico");
 
         private SettingsWindow? settingsWindow = null;
 
