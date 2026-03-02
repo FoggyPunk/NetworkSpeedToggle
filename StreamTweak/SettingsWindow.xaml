@@ -1,0 +1,303 @@
+<Window x:Class="StreamTweak.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="StreamTweak Settings 2.0" Height="520" Width="420"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
+        Background="{DynamicResource WindowBackground}"
+        Foreground="{DynamicResource TextForeground}"
+        FontFamily="Segoe UI">
+
+    <Window.Resources>
+        <SolidColorBrush x:Key="WindowBackground" Color="#FFF3F3F3"/>
+        <SolidColorBrush x:Key="PanelBackground" Color="#FFFFFFFF"/>
+        <SolidColorBrush x:Key="TextForeground" Color="#FF202020"/>
+        <SolidColorBrush x:Key="BorderColor" Color="#FFD1D1D1"/>
+        <SolidColorBrush x:Key="AccentColor" Color="{x:Static SystemParameters.WindowGlassColor}"/>
+        <SolidColorBrush x:Key="AccentHoverColor" Color="#FF106EBE"/>
+
+        <!-- Toggle Switch Style -->
+        <Style x:Key="ToggleSwitchStyle" TargetType="CheckBox">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <Grid VerticalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border x:Name="Track" Grid.Column="0" Width="40" Height="22"
+                                    CornerRadius="11" Background="{DynamicResource BorderColor}">
+                                <Ellipse x:Name="Thumb" Width="16" Height="16" Fill="White"
+                                         HorizontalAlignment="Left" Margin="3,0,0,0"/>
+                            </Border>
+                            <ContentPresenter Grid.Column="1" Margin="8,0,0,0"
+                                              VerticalAlignment="Center" RecognizesAccessKey="True"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Track" Property="Background" Value="{DynamicResource AccentColor}"/>
+                                <Setter TargetName="Thumb" Property="Margin" Value="21,0,0,0"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.45"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ComboBox Style -->
+        <Style TargetType="ComboBox">
+            <Setter Property="Background" Value="{DynamicResource PanelBackground}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextForeground}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="6,3"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="ItemContainerStyle">
+                <Setter.Value>
+                    <Style TargetType="ComboBoxItem">
+                        <Setter Property="Background" Value="{DynamicResource PanelBackground}"/>
+                        <Setter Property="Foreground" Value="{DynamicResource TextForeground}"/>
+                        <Setter Property="Padding" Value="8,4"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ComboBoxItem">
+                                    <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter Property="Background" Value="{DynamicResource AccentColor}"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="{DynamicResource AccentColor}"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <Border x:Name="MainBorder" Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6"/>
+                            <Grid Margin="8,0">
+                                <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Left"
+                                                  Content="{TemplateBinding SelectionBoxItem}"/>
+                                <Path HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,4,0"
+                                      Data="M 0 0 L 4 4 L 8 0" Stroke="{TemplateBinding Foreground}"
+                                      StrokeThickness="2" StrokeEndLineCap="Round"/>
+                            </Grid>
+                            <ToggleButton Background="Transparent" BorderThickness="0" Focusable="False"
+                                          FocusVisualStyle="{x:Null}"
+                                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border Background="Transparent"/>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+                            <Popup Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}"
+                                   AllowsTransparency="True" Focusable="False" PopupAnimation="Fade">
+                                <Border Background="{DynamicResource PanelBackground}"
+                                        BorderBrush="{DynamicResource BorderColor}"
+                                        BorderThickness="1" CornerRadius="6" Margin="0,4,0,0">
+                                    <ScrollViewer>
+                                        <StackPanel IsItemsHost="True"/>
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="MainBorder" Property="BorderBrush" Value="{DynamicResource AccentColor}"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter TargetName="MainBorder" Property="BorderBrush" Value="{DynamicResource AccentColor}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.6"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Button Styles -->
+        <Style x:Key="ModernButton" TargetType="Button">
+            <Setter Property="Background" Value="{DynamicResource PanelBackground}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextForeground}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="15,5"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="5">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#1A000000"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="PrimaryButton" TargetType="Button" BasedOn="{StaticResource ModernButton}">
+            <Setter Property="Background" Value="{DynamicResource AccentColor}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource AccentHoverColor}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Text="Hardware Configuration" FontWeight="SemiBold" FontSize="16" VerticalAlignment="Center"/>
+            <Button x:Name="ThemeToggleButton" Content="🌙 Dark Mode" HorizontalAlignment="Right"
+                    Style="{StaticResource ModernButton}" Width="110" Height="28" Padding="5,2"
+                    Click="ThemeToggleButton_Click"/>
+        </Grid>
+
+        <!-- Adapter -->
+        <TextBlock Text="Select Physical Network Adapter:" FontWeight="Medium" Margin="0,0,0,8" Grid.Row="1"/>
+        <ComboBox x:Name="AdapterComboBox" Margin="0,0,0,15" Grid.Row="2"
+                  SelectionChanged="AdapterComboBox_SelectionChanged"/>
+
+        <!-- Current Speed -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,15">
+            <TextBlock Text="Current Speed:" FontWeight="Medium" Margin="0,0,10,0"/>
+            <TextBlock x:Name="CurrentSpeedTextBlock" Text="Detecting..." FontWeight="Bold"
+                       Foreground="{DynamicResource AccentColor}"/>
+        </StackPanel>
+
+        <!-- Target Speed -->
+        <TextBlock Text="Target Link Speed:" FontWeight="Medium" Margin="0,0,0,8" Grid.Row="4"/>
+        <ComboBox x:Name="SpeedComboBox" Margin="0,0,0,15" Grid.Row="5"/>
+
+        <!-- Separator -->
+        <Separator Grid.Row="6" Margin="0,5,0,15" Background="{DynamicResource BorderColor}"/>
+
+        <!-- Display Configuration Header -->
+        <TextBlock Grid.Row="7" Text="Display Configuration" FontWeight="SemiBold" FontSize="14"
+                   Margin="0,0,0,12"/>
+
+        <!-- Resolution + Refresh Rate -->
+        <Grid Grid.Row="8" Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                <TextBlock Text="Resolution:" FontWeight="Medium" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                <TextBlock x:Name="ResolutionTextBlock" Text="—" FontWeight="Bold"
+                           Foreground="{DynamicResource AccentColor}" VerticalAlignment="Center"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <TextBlock Text="Refresh Rate:" FontWeight="Medium" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                <TextBlock x:Name="RefreshRateTextBlock" Text="—" FontWeight="Bold"
+                           Foreground="{DynamicResource AccentColor}" VerticalAlignment="Center"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Additional Display Info: show GPU only -->
+        <Grid Grid.Row="9" Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="GPU:" FontWeight="Medium" VerticalAlignment="Center"/>
+            <TextBlock Grid.Row="0" Grid.Column="1" x:Name="GpuTextBlock" Text="—" FontWeight="Bold" Foreground="{DynamicResource AccentColor}" VerticalAlignment="Center"/>
+        </Grid>
+
+        <!-- HDR Toggle -->
+        <Grid Grid.Row="10" Margin="0,0,0,5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="HDR" FontWeight="Medium" VerticalAlignment="Center" Margin="0,0,12,0"/>
+            <TextBlock Grid.Column="1" x:Name="HdrStatusTextBlock" Text="" VerticalAlignment="Center"
+                       FontSize="11" Foreground="Gray"/>
+            <CheckBox Grid.Column="2" x:Name="HdrToggle" Style="{StaticResource ToggleSwitchStyle}"
+                      Checked="HdrToggle_Changed" Unchecked="HdrToggle_Changed" VerticalAlignment="Center"/>
+        </Grid>
+
+        <!-- Buttons -->
+        <Grid Grid.Row="12" Margin="0,15,0,0">
+            <Button x:Name="StreamingModeButton" Content="Start Streaming Mode" Width="170" Height="32"
+                    Click="StreamingModeButton_Click" Style="{StaticResource ModernButton}"
+                    HorizontalAlignment="Left"/>
+            <Button Content="Apply Settings" Width="110" Height="32" Click="ApplyButton_Click"
+                    Style="{StaticResource PrimaryButton}" HorizontalAlignment="Right"/>
+        </Grid>
+
+        <!-- Legend -->
+        <Grid Grid.Row="13" Margin="0,12,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="140"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left: 1G icon -->
+            <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" Grid.ColumnSpan="2" Width="160">
+                <Image Source="pack://application:,,,/Resources/1g.ico"
+                       Width="24" Height="24" Margin="0,0,8,0"/>
+                <TextBlock Text="From 1 Gbps and below"
+                           VerticalAlignment="Center" FontSize="11" Width="117"/>
+            </StackPanel>
+
+            <!-- Right: 25G icon -->
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Image Source="pack://application:,,,/Resources/25g.ico"
+                       Width="24" Height="24" Margin="0,0,8,0"/>
+                <TextBlock Text="From 2.5 Gbps and above"
+                           VerticalAlignment="Center" TextWrapping="NoWrap" FontSize="11"/>
+            </StackPanel>
+        </Grid>
+
+    </Grid>
+</Window>
