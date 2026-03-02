@@ -9,7 +9,7 @@
 
 <img width="406" height="514" alt="streamtweak" src="https://github.com/user-attachments/assets/d155b874-3445-4385-93be-2b820c1de04d" />
 
-## 🚀 The Evolution: From Network Speed Toggle to StreamTweak
+## 🚀 The Evolution: From Network Speed Toggle to StreamTweak 🎮
 The project originally started as **Network Speed Toggle**, a utility focused exclusively on solving a specific issue in the cloud gaming community: Ethernet link speed mismatches (e.g., Host at 2.5 Gbps and Client at 1 Gbps) causing stuttering and UDP packet loss on unmanaged switches.
 
 With **Version 2.0**, the project has evolved. It is no longer just a network tool; it has become **StreamTweak**. Our mission is to progressively add all the "quality-of-life" features needed by those who manage a Host PC running **[Sunshine](https://github.com/LizardByte/Sunshine)** or its fork **[Apollo](https://github.com/ClassicOldSong/Apollo)**, eliminating tedious manual configurations before every gaming session.
