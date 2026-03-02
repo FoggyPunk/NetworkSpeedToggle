@@ -1,11 +1,12 @@
 ; =====================================================
-; Network Speed Toggle v1.2.1 - GitHub Release Installer
+; Network Speed Toggle v1.2.2 - GitHub Release Installer
 ; =====================================================
-
 #define MyAppName "Network Speed Toggle"
-#define MyAppVersion "1.2.1"
+#define MyAppVersion "1.2.2"
 #define MyAppPublisher "FoggyPunk"
 #define MyAppExeName "NetworkSpeedToggle.exe"
+
+#include "CodeDependencies.iss"
 
 [Setup]
 AppId={{D37D0ED6-5E8D-4131-B2C1-30A5840AC97B}
@@ -15,13 +16,9 @@ AppPublisher={#MyAppPublisher}
 DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 InfoBeforeFile=changelog.txt
-
-; --- ICONS ---
 SetupIconFile=Resources\25g.ico
 WizardSmallImageFile=Resources\25g.bmp
 UninstallDisplayIcon={app}\Resources\25g.ico
-
-; --- UI TWEAKS ---
 AllowNoIcons=yes
 DirExistsWarning=no
 CloseApplications=yes
@@ -59,3 +56,10 @@ Type: filesandordirs; Name: "{localappdata}\NetworkSpeedToggle\config.json"
 Type: dirifempty; Name: "{localappdata}\NetworkSpeedToggle"
 Type: dirifempty; Name: "{app}\Resources"
 Type: dirifempty; Name: "{app}"
+
+[Code]
+function InitializeSetup: Boolean;
+begin
+  Dependency_AddDotNet80Desktop;
+  Result := True;
+end;
