@@ -2,6 +2,15 @@
  NETWORK SPEED TOGGLE - CHANGELOG
 ==========================================
 
+Version 1.2.2 - The "Lightweight" Update (03/03/2026)
+------------------------------------------
+🔧 IMPROVEMENTS:
+- Switched from self-contained to framework-dependent build
+  Installer size reduced from ~50MB to ~3MB
+- Automatic .NET 8 runtime installation: if not already present
+  on the target machine, the installer will silently download
+  and install it before proceeding
+
 Version 1.2.1 - The "No Prerequisites" Update (01/03/2026)
 ------------------------------------------
 🔧 IMPROVEMENTS:
