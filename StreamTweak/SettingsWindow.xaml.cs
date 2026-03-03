@@ -9,7 +9,6 @@ using System.Windows.Controls;
 using System.IO;
 using Microsoft.Management.Infrastructure;
 using System.Windows.Media;
-using System.Runtime.InteropServices;
 using System.Windows.Interop;
 using Microsoft.Win32;
 using System.Threading.Tasks;
@@ -23,6 +22,7 @@ namespace StreamTweak
         private const int DWMWA_USE_IMMERSIVE_DARK_MODE = 20;
 
         #region Native display interop
+
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         private struct DISPLAY_DEVICE
         {
@@ -39,7 +39,10 @@ namespace StreamTweak
         }
 
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-        private static extern bool EnumDisplayDevices(string? lpDevice, int iDevNum, ref DISPLAY_DEVICE lpDisplayDevice, int dwFlags);
+        private static extern bool EnumDisplayDevices(string? lpDevice, int iDevNum,
+            ref DISPLAY_DEVICE lpDisplayDevice, int dwFlags);
+
+        #endregion
 
         private readonly string configFilePath;
         public bool HasAppliedChanges { get; private set; } = false;
@@ -60,7 +63,8 @@ namespace StreamTweak
             InitializeComponent();
 
             this.Icon = new System.Windows.Media.Imaging.BitmapImage(
-                new Uri(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\streamtweak.ico"), UriKind.Absolute));
+                new Uri(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
+                    @"Resources\streamtweak.ico"), UriKind.Absolute));
 
             string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             string appFolder = Path.Combine(appDataPath, "StreamTweak");
@@ -85,98 +89,47 @@ namespace StreamTweak
             ResolutionTextBlock.Text = width > 0 ? $"{width} × {height}" : "Unknown";
             RefreshRateTextBlock.Text = refreshRate > 0 ? $"{refreshRate} Hz" : "Unknown";
 
-            // Load HDR state without triggering the change event
-            HdrToggle.Checked -= HdrToggle_Changed;
-            HdrToggle.Unchecked -= HdrToggle_Changed;
-
-            var hdrState = DisplayHelper.GetHdrState();
-            switch (hdrState)
-            {
-                case DisplayHelper.HdrState.Enabled:
-                    HdrToggle.IsChecked = true;
-                    HdrToggle.IsEnabled = true;
-                    HdrStatusTextBlock.Text = "On";
-                    break;
-                case DisplayHelper.HdrState.Disabled:
-                    HdrToggle.IsChecked = false;
-                    HdrToggle.IsEnabled = true;
-                    HdrStatusTextBlock.Text = "Off";
-                    break;
-                case DisplayHelper.HdrState.NotSupported:
-                    HdrToggle.IsChecked = false;
-                    HdrToggle.IsEnabled = false;
-                    HdrStatusTextBlock.Text = "Not supported by this display";
-                    break;
-            }
-
-            HdrToggle.Checked += HdrToggle_Changed;
-            HdrToggle.Unchecked += HdrToggle_Changed;
-
-            // Populate extended display and GPU information for the new UI fields
-            try
-            {
-                PopulateExtendedDisplayInfo();
-            }
-            catch { /* best-effort, ignore errors */ }
+            PopulateGpuInfo();
         }
 
-        private void PopulateExtendedDisplayInfo()
+
+        private void PopulateGpuInfo()
         {
-            // Try to populate the display field with the monitor's reported name (previously shown as "Monitor Name / Model").
-            var tb = this.FindName("GpuTextBlock") as System.Windows.Controls.TextBlock;
             try
             {
-                string? monitorName = null;
+                string? gpuName = null;
                 try
                 {
                     DISPLAY_DEVICE d = new DISPLAY_DEVICE();
                     d.cb = Marshal.SizeOf(d);
                     if (EnumDisplayDevices(null, 0, ref d, 0))
-                        monitorName = string.IsNullOrWhiteSpace(d.DeviceString) ? null : d.DeviceString.Trim();
+                        gpuName = string.IsNullOrWhiteSpace(d.DeviceString) ? null : d.DeviceString.Trim();
                 }
-                catch { /* ignore monitor name failures */ }
-                #endregion
+                catch { }
 
-                if (!string.IsNullOrWhiteSpace(monitorName))
+                if (!string.IsNullOrWhiteSpace(gpuName))
                 {
-                    if (tb != null) tb.Text = monitorName!;
+                    GpuTextBlock.Text = gpuName!;
                     return;
                 }
 
-                // Fallback: use GPU name/driver if monitor name not available
-                using var session = Microsoft.Management.Infrastructure.CimSession.Create(null);
-                var instances = session.QueryInstances("root\\cimv2", "WQL", "SELECT Name, DriverVersion FROM Win32_VideoController");
+                // Fallback: WMI GPU name
+                using var session = CimSession.Create(null);
+                var instances = session.QueryInstances("root\\cimv2", "WQL",
+                    "SELECT Name FROM Win32_VideoController");
                 foreach (var inst in instances)
                 {
                     var name = inst.CimInstanceProperties["Name"].Value?.ToString() ?? string.Empty;
-                    var drv = inst.CimInstanceProperties["DriverVersion"].Value?.ToString() ?? string.Empty;
-                    if (tb != null) tb.Text = string.IsNullOrWhiteSpace(drv) ? name : $"{name} / {drv}";
-                    break;
+                    if (!string.IsNullOrWhiteSpace(name))
+                    {
+                        GpuTextBlock.Text = name;
+                        return;
+                    }
                 }
-                if (tb != null && string.IsNullOrWhiteSpace(tb.Text)) tb.Text = "Unknown";
-            }
-            catch { if (tb != null) tb.Text = "Unknown"; }
-        }
 
-        private void HdrToggle_Changed(object sender, RoutedEventArgs e)
-        {
-            bool enable = HdrToggle.IsChecked == true;
-            bool success = DisplayHelper.SetHdrState(enable);
-
-            if (success)
-            {
-                HdrStatusTextBlock.Text = enable ? "On" : "Off";
+                GpuTextBlock.Text = "Unknown";
             }
-            else
-            {
-                // Revert on failure
-                HdrToggle.Checked -= HdrToggle_Changed;
-                HdrToggle.Unchecked -= HdrToggle_Changed;
-                HdrToggle.IsChecked = !enable;
-                HdrToggle.Checked += HdrToggle_Changed;
-                HdrToggle.Unchecked += HdrToggle_Changed;
-                HdrStatusTextBlock.Text = "Failed to change HDR state";
-            }
+            catch { GpuTextBlock.Text = "Unknown"; }
         }
 
         public void SyncStreamingState(bool streamingActive, string originalSpeedKey)
@@ -317,9 +270,11 @@ namespace StreamTweak
             try
             {
                 string json = File.Exists(configFilePath) ? File.ReadAllText(configFilePath) : "{}";
-                var configData = JsonSerializer.Deserialize<Dictionary<string, object>>(json) ?? new Dictionary<string, object>();
+                var configData = JsonSerializer.Deserialize<Dictionary<string, object>>(json)
+                                 ?? new Dictionary<string, object>();
                 configData["IsDarkMode"] = isDarkMode;
-                File.WriteAllText(configFilePath, JsonSerializer.Serialize(configData, new JsonSerializerOptions { WriteIndented = true }));
+                File.WriteAllText(configFilePath,
+                    JsonSerializer.Serialize(configData, new JsonSerializerOptions { WriteIndented = true }));
             }
             catch { }
         }
@@ -329,10 +284,12 @@ namespace StreamTweak
             try
             {
                 string json = File.Exists(configFilePath) ? File.ReadAllText(configFilePath) : "{}";
-                var configData = JsonSerializer.Deserialize<Dictionary<string, object>>(json) ?? new Dictionary<string, object>();
+                var configData = JsonSerializer.Deserialize<Dictionary<string, object>>(json)
+                                 ?? new Dictionary<string, object>();
                 configData["StreamingMode"] = streamingMode;
                 configData["OriginalSpeed"] = originalSpeedKey;
-                File.WriteAllText(configFilePath, JsonSerializer.Serialize(configData, new JsonSerializerOptions { WriteIndented = true }));
+                File.WriteAllText(configFilePath,
+                    JsonSerializer.Serialize(configData, new JsonSerializerOptions { WriteIndented = true }));
             }
             catch { }
         }
@@ -628,17 +585,17 @@ Restart-NetAdapter -Name $adapterName -Confirm:$false
             try
             {
                 string json = File.Exists(configFilePath) ? File.ReadAllText(configFilePath) : "{}";
-                var configData = JsonSerializer.Deserialize<Dictionary<string, object>>(json) ?? new Dictionary<string, object>();
+                var configData = JsonSerializer.Deserialize<Dictionary<string, object>>(json)
+                                 ?? new Dictionary<string, object>();
                 configData["NetworkAdapterName"] = selectedAdapter;
                 configData["IsDarkMode"] = isDarkMode;
-                File.WriteAllText(configFilePath, JsonSerializer.Serialize(configData, new JsonSerializerOptions { WriteIndented = true }));
+                File.WriteAllText(configFilePath,
+                    JsonSerializer.Serialize(configData, new JsonSerializerOptions { WriteIndented = true }));
             }
             catch { }
 
             ApplySpeedInternal(selectedSpeedKey);
             await RefreshSpeedAfterChange(selectedAdapter);
         }
-
-        // removed: connection/device heuristics and native display P/Invoke (no longer needed)
     }
 }

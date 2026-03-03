@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using Microsoft.Win32;
 
 namespace StreamTweak
 {
     public static class DisplayHelper
     {
-        #region P/Invoke
+        #region P/Invoke structs and constants
 
         [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Ansi, Size = 156)]
         private struct DEVMODE
@@ -17,10 +18,18 @@ namespace StreamTweak
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        private struct LUID { public uint LowPart; public int HighPart; }
+        private struct LUID
+        {
+            public uint LowPart;
+            public int HighPart;
+        }
 
         [StructLayout(LayoutKind.Sequential)]
-        private struct DISPLAYCONFIG_RATIONAL { public uint Numerator; public uint Denominator; }
+        private struct DISPLAYCONFIG_RATIONAL
+        {
+            public uint Numerator;
+            public uint Denominator;
+        }
 
         [StructLayout(LayoutKind.Sequential)]
         private struct DISPLAYCONFIG_PATH_SOURCE_INFO
@@ -42,7 +51,7 @@ namespace StreamTweak
             public uint scaling;
             public DISPLAYCONFIG_RATIONAL refreshRate;
             public uint scanLineOrdering;
-            [MarshalAs(UnmanagedType.Bool)] public bool targetAvailable;
+            public uint targetAvailable;   // kept as uint to avoid Bool marshaling issues
             public uint statusFlags;
         }
 
@@ -54,7 +63,7 @@ namespace StreamTweak
             public uint flags;
         }
 
-        [StructLayout(LayoutKind.Sequential, Size = 88)]
+        [StructLayout(LayoutKind.Sequential, Size = 64)]
         private struct DISPLAYCONFIG_MODE_INFO { }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -83,6 +92,8 @@ namespace StreamTweak
         }
 
         private const uint QDC_ONLY_ACTIVE_PATHS = 2;
+        private const uint SDC_APPLY = 0x00000004;
+        private const uint SDC_USE_SUPPLIED_DISPLAY_CONFIG = 0x00000020;
         private const uint DISPLAYCONFIG_DEVICE_INFO_GET_ADVANCED_COLOR_INFO = 9;
         private const uint DISPLAYCONFIG_DEVICE_INFO_SET_ADVANCED_COLOR_STATE = 10;
 
@@ -90,16 +101,35 @@ namespace StreamTweak
         private static extern bool EnumDisplaySettingsA(string? deviceName, int iModeNum, ref DEVMODE devMode);
 
         [DllImport("user32.dll")]
-        private static extern int GetDisplayConfigBufferSizes(uint flags, out uint numPathArrayElements, out uint numModeInfoArrayElements);
+        private static extern int GetDisplayConfigBufferSizes(
+            uint flags,
+            out uint numPathArrayElements,
+            out uint numModeInfoArrayElements);
 
         [DllImport("user32.dll")]
-        private static extern int QueryDisplayConfig(uint flags, ref uint numPathArrayElements, [Out] DISPLAYCONFIG_PATH_INFO[] pathArray, ref uint numModeInfoArrayElements, [Out] DISPLAYCONFIG_MODE_INFO[] modeInfoArray, IntPtr currentTopologyId);
+        private static extern int QueryDisplayConfig(
+            uint flags,
+            ref uint numPathArrayElements,
+            [Out] DISPLAYCONFIG_PATH_INFO[] pathArray,
+            ref uint numModeInfoArrayElements,
+            [Out] DISPLAYCONFIG_MODE_INFO[] modeInfoArray,
+            IntPtr currentTopologyId);
 
         [DllImport("user32.dll")]
-        private static extern int DisplayConfigGetDeviceInfo(ref DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO requestPacket);
+        private static extern int DisplayConfigGetDeviceInfo(
+            ref DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO requestPacket);
 
         [DllImport("user32.dll")]
-        private static extern int DisplayConfigSetDeviceInfo(ref DISPLAYCONFIG_SET_ADVANCED_COLOR_STATE requestPacket);
+        private static extern int DisplayConfigSetDeviceInfo(
+            ref DISPLAYCONFIG_SET_ADVANCED_COLOR_STATE requestPacket);
+
+        [DllImport("user32.dll")]
+        private static extern int SetDisplayConfig(
+            uint numPathArrayElements,
+            [In] DISPLAYCONFIG_PATH_INFO[] pathArray,
+            uint numModeInfoArrayElements,
+            [In] DISPLAYCONFIG_MODE_INFO[] modeInfoArray,
+            uint flags);
 
         #endregion
 
@@ -122,55 +152,175 @@ namespace StreamTweak
         {
             try
             {
-                int ret = GetDisplayConfigBufferSizes(QDC_ONLY_ACTIVE_PATHS, out uint pathCount, out uint modeCount);
-                if (ret != 0) return HdrState.NotSupported;
+                // First try: Read from Windows registry (the authoritative source for HDR state)
+                try
+                {
+                    using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(
+                        @"Software\Microsoft\Windows\CurrentVersion\VideoSettings");
 
-                var paths = new DISPLAYCONFIG_PATH_INFO[pathCount];
-                var modes = new DISPLAYCONFIG_MODE_INFO[modeCount];
+                    if (key != null)
+                    {
+                        var value = key.GetValue("EnableHDROutput");
+                        if (value != null)
+                        {
+                            int hdrValue = Convert.ToInt32(value);
+                            if (hdrValue == 1)
+                                return HdrState.Enabled;
+                            else if (hdrValue == 0)
+                                return HdrState.Disabled;
+                        }
+                    }
+                }
+                catch { }
 
-                ret = QueryDisplayConfig(QDC_ONLY_ACTIVE_PATHS, ref pathCount, paths, ref modeCount, modes, IntPtr.Zero);
-                if (ret != 0) return HdrState.NotSupported;
+                // Second try: Use DisplayConfig API to detect HDR support and state
+                if (GetPathsAndModes(out var paths, out var modes, out uint pathCount))
+                {
+                    if (pathCount > 0)
+                    {
+                        // Query the first active target to get HDR state
+                        for (int i = 0; i < (int)pathCount; i++)
+                        {
+                            var getColorInfo = new DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO();
+                            getColorInfo.header.type = DISPLAYCONFIG_DEVICE_INFO_GET_ADVANCED_COLOR_INFO;
+                            getColorInfo.header.size = (uint)Marshal.SizeOf<DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO>();
+                            getColorInfo.header.adapterId = paths[i].targetInfo.adapterId;
+                            getColorInfo.header.id = paths[i].targetInfo.id;
 
-                var colorInfo = new DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO();
-                colorInfo.header.type = DISPLAYCONFIG_DEVICE_INFO_GET_ADVANCED_COLOR_INFO;
-                colorInfo.header.size = (uint)Marshal.SizeOf(colorInfo);
-                colorInfo.header.adapterId = paths[0].targetInfo.adapterId;
-                colorInfo.header.id = paths[0].targetInfo.id;
+                            int rc = DisplayConfigGetDeviceInfo(ref getColorInfo);
+                            if (rc == 0)
+                            {
+                                // Check if display supports HDR and its current state
+                                // value == 1 means HDR is enabled
+                                if (getColorInfo.value == 1)
+                                    return HdrState.Enabled;
+                                else if (getColorInfo.value == 0)
+                                    return HdrState.Disabled;
+                            }
+                        }
+                    }
+                }
 
-                ret = DisplayConfigGetDeviceInfo(ref colorInfo);
-                if (ret != 0) return HdrState.NotSupported;
-
-                bool supported = (colorInfo.value & 1) != 0;
-                bool enabled = (colorInfo.value & 2) != 0;
-
-                if (!supported) return HdrState.NotSupported;
-                return enabled ? HdrState.Enabled : HdrState.Disabled;
+                return HdrState.NotSupported;
             }
             catch { return HdrState.NotSupported; }
+        }
+
+        // Added missing GetPaths method to query active display paths
+        private static bool GetPaths(out DISPLAYCONFIG_PATH_INFO[] paths, out uint pathCount)
+        {
+            paths = Array.Empty<DISPLAYCONFIG_PATH_INFO>();
+            pathCount = 0;
+
+            try
+            {
+                int rc = GetDisplayConfigBufferSizes(QDC_ONLY_ACTIVE_PATHS, out uint numPathArrayElements, out uint numModeInfoArrayElements);
+                if (rc != 0 || numPathArrayElements == 0)
+                    return false;
+
+                var pathArray = new DISPLAYCONFIG_PATH_INFO[numPathArrayElements];
+                var modeInfoArray = new DISPLAYCONFIG_MODE_INFO[numModeInfoArrayElements];
+
+                uint pathElements = numPathArrayElements;
+                uint modeElements = numModeInfoArrayElements;
+
+                rc = QueryDisplayConfig(QDC_ONLY_ACTIVE_PATHS, ref pathElements, pathArray, ref modeElements, modeInfoArray, IntPtr.Zero);
+                if (rc != 0)
+                    return false;
+
+                paths = new DISPLAYCONFIG_PATH_INFO[(int)pathElements];
+                Array.Copy(pathArray, paths, (int)pathElements);
+                pathCount = pathElements;
+
+                return true;
+            }
+            catch
+            {
+                paths = Array.Empty<DISPLAYCONFIG_PATH_INFO>();
+                pathCount = 0;
+                return false;
+            }
+        }
+
+        // Get both paths and mode info for applying configurations
+        private static bool GetPathsAndModes(out DISPLAYCONFIG_PATH_INFO[] paths, out DISPLAYCONFIG_MODE_INFO[] modes, out uint pathCount)
+        {
+            paths = Array.Empty<DISPLAYCONFIG_PATH_INFO>();
+            modes = Array.Empty<DISPLAYCONFIG_MODE_INFO>();
+            pathCount = 0;
+
+            try
+            {
+                int rc = GetDisplayConfigBufferSizes(QDC_ONLY_ACTIVE_PATHS, out uint numPathArrayElements, out uint numModeInfoArrayElements);
+                if (rc != 0 || numPathArrayElements == 0)
+                    return false;
+
+                var pathArray = new DISPLAYCONFIG_PATH_INFO[numPathArrayElements];
+                var modeInfoArray = new DISPLAYCONFIG_MODE_INFO[numModeInfoArrayElements];
+
+                uint pathElements = numPathArrayElements;
+                uint modeElements = numModeInfoArrayElements;
+
+                rc = QueryDisplayConfig(QDC_ONLY_ACTIVE_PATHS, ref pathElements, pathArray, ref modeElements, modeInfoArray, IntPtr.Zero);
+                if (rc != 0)
+                    return false;
+
+                paths = new DISPLAYCONFIG_PATH_INFO[(int)pathElements];
+                Array.Copy(pathArray, paths, (int)pathElements);
+
+                modes = new DISPLAYCONFIG_MODE_INFO[(int)modeElements];
+                Array.Copy(modeInfoArray, modes, (int)modeElements);
+
+                pathCount = pathElements;
+
+                return true;
+            }
+            catch
+            {
+                paths = Array.Empty<DISPLAYCONFIG_PATH_INFO>();
+                modes = Array.Empty<DISPLAYCONFIG_MODE_INFO>();
+                pathCount = 0;
+                return false;
+            }
         }
 
         public static bool SetHdrState(bool enable)
         {
             try
             {
-                int ret = GetDisplayConfigBufferSizes(QDC_ONLY_ACTIVE_PATHS, out uint pathCount, out uint modeCount);
-                if (ret != 0) return false;
+                if (!GetPathsAndModes(out var paths, out var modes, out uint pathCount))
+                    return false;
 
-                var paths = new DISPLAYCONFIG_PATH_INFO[pathCount];
-                var modes = new DISPLAYCONFIG_MODE_INFO[modeCount];
+                if (pathCount == 0 || paths.Length == 0)
+                    return false;
 
-                ret = QueryDisplayConfig(QDC_ONLY_ACTIVE_PATHS, ref pathCount, paths, ref modeCount, modes, IntPtr.Zero);
-                if (ret != 0) return false;
+                bool anySuccess = false;
 
-                var setState = new DISPLAYCONFIG_SET_ADVANCED_COLOR_STATE();
-                setState.header.type = DISPLAYCONFIG_DEVICE_INFO_SET_ADVANCED_COLOR_STATE;
-                setState.header.size = (uint)Marshal.SizeOf(setState);
-                setState.header.adapterId = paths[0].targetInfo.adapterId;
-                setState.header.id = paths[0].targetInfo.id;
-                setState.enableAdvancedColor = enable ? 1u : 0u;
+                // Set the HDR state for each active display
+                for (int i = 0; i < (int)pathCount; i++)
+                {
+                    var setState = new DISPLAYCONFIG_SET_ADVANCED_COLOR_STATE();
+                    setState.header.type = DISPLAYCONFIG_DEVICE_INFO_SET_ADVANCED_COLOR_STATE;
+                    setState.header.size = (uint)Marshal.SizeOf<DISPLAYCONFIG_SET_ADVANCED_COLOR_STATE>();
+                    setState.header.adapterId = paths[i].targetInfo.adapterId;
+                    setState.header.id = paths[i].targetInfo.id;
+                    setState.enableAdvancedColor = enable ? 1u : 0u;
 
-                ret = DisplayConfigSetDeviceInfo(ref setState);
-                return ret == 0;
+                    int rc = DisplayConfigSetDeviceInfo(ref setState);
+                    if (rc == 0)
+                        anySuccess = true;
+                }
+
+                // Apply the configuration changes to the system using both flags for maximum compatibility
+                if (anySuccess && paths.Length > 0)
+                {
+                    int rc = SetDisplayConfig((uint)paths.Length, paths, (uint)modes.Length, modes, 
+                        SDC_USE_SUPPLIED_DISPLAY_CONFIG | SDC_APPLY);
+                    if (rc == 0)
+                        return true;
+                }
+
+                return anySuccess;
             }
             catch { return false; }
         }
