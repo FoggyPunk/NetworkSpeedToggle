@@ -1,7 +1,7 @@
 <Window x:Class="StreamTweak.SettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="StreamTweak Settings 2.0" Height="520" Width="420"
+        Title="StreamTweak 2.0 Settings" Height="500" Width="420"
         WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
         Background="{DynamicResource WindowBackground}"
         Foreground="{DynamicResource TextForeground}"
@@ -173,21 +173,19 @@
 
     <Grid Margin="20">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+         <RowDefinition Height="Auto"/>
+         <RowDefinition Height="Auto"/>
+         <RowDefinition Height="Auto"/>
+         <RowDefinition Height="Auto"/>
+         <RowDefinition Height="Auto"/>
+         <RowDefinition Height="Auto"/>
+         <RowDefinition Height="Auto"/>
+         <RowDefinition Height="Auto"/>
+         <RowDefinition Height="Auto"/>
+         <RowDefinition Height="Auto"/>
+         <RowDefinition Height="*"/>
+         <RowDefinition Height="Auto"/>
+         </Grid.RowDefinitions>
 
         <!-- Header -->
         <Grid Grid.Row="0" Margin="0,0,0,20">
@@ -238,36 +236,19 @@
             </StackPanel>
         </Grid>
 
-        <!-- Additional Display Info: show GPU only -->
+        <!-- GPU -->
         <Grid Grid.Row="9" Margin="0,0,0,12">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="GPU:" FontWeight="Medium" VerticalAlignment="Center"/>
-            <TextBlock Grid.Row="0" Grid.Column="1" x:Name="GpuTextBlock" Text="—" FontWeight="Bold" Foreground="{DynamicResource AccentColor}" VerticalAlignment="Center"/>
-        </Grid>
-
-        <!-- HDR Toggle -->
-        <Grid Grid.Row="10" Margin="0,0,0,5">
-            <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" Text="HDR" FontWeight="Medium" VerticalAlignment="Center" Margin="0,0,12,0"/>
-            <TextBlock Grid.Column="1" x:Name="HdrStatusTextBlock" Text="" VerticalAlignment="Center"
-                       FontSize="11" Foreground="Gray"/>
-            <CheckBox Grid.Column="2" x:Name="HdrToggle" Style="{StaticResource ToggleSwitchStyle}"
-                      Checked="HdrToggle_Changed" Unchecked="HdrToggle_Changed" VerticalAlignment="Center"/>
+            <TextBlock Grid.Column="0" Text="GPU:" FontWeight="Medium" VerticalAlignment="Center" Margin="0,0,8,0"/>
+            <TextBlock Grid.Column="1" x:Name="GpuTextBlock" Text="—" FontWeight="Bold"
+                       Foreground="{DynamicResource AccentColor}" VerticalAlignment="Center"/>
         </Grid>
 
         <!-- Buttons -->
-        <Grid Grid.Row="12" Margin="0,15,0,0">
+        <Grid Grid.Row="10" Margin="0,15,0,0">
             <Button x:Name="StreamingModeButton" Content="Start Streaming Mode" Width="170" Height="32"
                     Click="StreamingModeButton_Click" Style="{StaticResource ModernButton}"
                     HorizontalAlignment="Left"/>
@@ -275,29 +256,11 @@
                     Style="{StaticResource PrimaryButton}" HorizontalAlignment="Right"/>
         </Grid>
 
-        <!-- Legend -->
-        <Grid Grid.Row="13" Margin="0,12,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="140"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <!-- Left: 1G icon -->
-            <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" Grid.ColumnSpan="2" Width="160">
-                <Image Source="pack://application:,,,/Resources/1g.ico"
-                       Width="24" Height="24" Margin="0,0,8,0"/>
-                <TextBlock Text="From 1 Gbps and below"
-                           VerticalAlignment="Center" FontSize="11" Width="117"/>
-            </StackPanel>
-
-            <!-- Right: 25G icon -->
-            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                <Image Source="pack://application:,,,/Resources/25g.ico"
-                       Width="24" Height="24" Margin="0,0,8,0"/>
-                <TextBlock Text="From 2.5 Gbps and above"
-                           VerticalAlignment="Center" TextWrapping="NoWrap" FontSize="11"/>
-            </StackPanel>
-        </Grid>
-
+        <!-- Info Text -->
+        <StackPanel Grid.Row="11" Orientation="Vertical" HorizontalAlignment="Center" Margin="0,12,0,0" VerticalAlignment="Center">
+            <TextBlock Text="Streaming Mode auto-sets the Target Link Speed to 1Gbps. Stop to revert to original Speed." 
+                       FontSize="9" Foreground="#FF808080" TextAlignment="Center" Margin="0,0,0,4"/>
+            <Image Source="pack://application:,,,/Resources/streammodeok.ico" Width="16" Height="16" HorizontalAlignment="Center"/>
+        </StackPanel>
     </Grid>
 </Window>

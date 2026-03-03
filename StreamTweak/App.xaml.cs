@@ -16,8 +16,8 @@ namespace StreamTweak
     {
         private TaskbarIcon tb = default!;
         private string adapterName = "Ethernet";
-        private readonly string icon1GPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\1g.ico");
-        private readonly string icon25GPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\25g.ico");
+        private readonly string iconOkPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\streammodeok.ico");
+        private readonly string iconKoPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\streammodeko.ico");
 
         private SettingsWindow? settingsWindow = null;
         private bool isStreamingModeActive = false;
@@ -42,27 +42,6 @@ namespace StreamTweak
             UpdateIconBasedOnSpeed(false);
             UpdateStreamingMenuItem();
             UpdateDisplayInfoMenuItems();
-        }
-
-        private void UpdateDisplayInfoMenuItems()
-        {
-            try
-            {
-                var (width, height, refreshRate) = DisplayHelper.GetPrimaryDisplayInfo();
-
-                var items = tb?.ContextMenu?.Items.OfType<MenuItem>().ToList();
-                if (items == null) return;
-
-                var resItem = items.FirstOrDefault(m => m.Header?.ToString()?.StartsWith("Resolution") == true);
-                var refItem = items.FirstOrDefault(m => m.Header?.ToString()?.StartsWith("Refresh Rate") == true);
-
-                if (resItem != null)
-                    resItem.Header = width > 0 ? $"Resolution: {width} × {height}" : "Resolution: Unknown";
-
-                if (refItem != null)
-                    refItem.Header = refreshRate > 0 ? $"Refresh Rate: {refreshRate} Hz" : "Refresh Rate: Unknown";
-            }
-            catch { }
         }
 
         private void LoadConfig()
@@ -91,6 +70,7 @@ namespace StreamTweak
             catch { }
         }
 
+        // Returns true if current speed is ~1 Gbps (streaming sweet spot)
         private bool IsCurrentSpeed1G()
         {
             var ni = NetworkInterface.GetAllNetworkInterfaces()
@@ -115,29 +95,27 @@ namespace StreamTweak
                 if (ni != null && ni.OperationalStatus == OperationalStatus.Up)
                     speedBps = ni.Speed;
 
-                string currentSpeedText = "";
+                string currentSpeedText;
 
                 if (speedBps <= 0)
                 {
-                    tb.Icon = new System.Drawing.Icon(icon1GPath);
+                    tb.Icon = new System.Drawing.Icon(iconKoPath);
                     currentSpeedText = "Disconnected / Negotiating";
                     tb.ToolTipText = $"Network: {adapterName}\nStatus: {currentSpeedText}";
                     return false;
                 }
-                else if (speedBps >= 2_500_000_000)
-                {
-                    tb.Icon = new System.Drawing.Icon(icon25GPath);
-                    currentSpeedText = $"{(speedBps / 1_000_000_000.0):0.##} Gbps";
-                    tb.ToolTipText = $"Network: {adapterName}\nCurrent Link Speed: {currentSpeedText}";
-                }
-                else
-                {
-                    tb.Icon = new System.Drawing.Icon(icon1GPath);
-                    currentSpeedText = speedBps >= 1_000_000_000
-                        ? $"{(speedBps / 1_000_000_000.0):0.##} Gbps"
-                        : $"{(speedBps / 1_000_000.0):0.##} Mbps";
-                    tb.ToolTipText = $"Network: {adapterName}\nCurrent Link Speed: {currentSpeedText}";
-                }
+
+                long mbps = speedBps / 1_000_000;
+                bool is1G = mbps >= 900 && mbps <= 1100;
+
+                // streammodeok = 1 Gbps (streaming sweet spot), streammodeko = everything else
+                tb.Icon = new System.Drawing.Icon(is1G ? iconOkPath : iconKoPath);
+
+                currentSpeedText = speedBps >= 1_000_000_000
+                    ? $"{(speedBps / 1_000_000_000.0):0.##} Gbps"
+                    : $"{mbps:0.##} Mbps";
+
+                tb.ToolTipText = $"Network: {adapterName}\nCurrent Link Speed: {currentSpeedText}";
 
                 if (showNotification)
                 {
@@ -153,7 +131,7 @@ namespace StreamTweak
             }
             catch
             {
-                tb.Icon = new System.Drawing.Icon(icon1GPath);
+                tb.Icon = new System.Drawing.Icon(iconKoPath);
                 tb.ToolTipText = "StreamTweak\n(Status Unknown)";
                 return false;
             }
@@ -177,6 +155,29 @@ namespace StreamTweak
                 menuItem.Header = "Start Streaming Mode";
                 menuItem.IsEnabled = !IsCurrentSpeed1G();
             }
+        }
+
+        private void UpdateDisplayInfoMenuItems()
+        {
+            try
+            {
+                var (width, height, refreshRate) = DisplayHelper.GetPrimaryDisplayInfo();
+
+                var resItem = tb?.ContextMenu?.Items
+                    .OfType<MenuItem>()
+                    .FirstOrDefault(m => m.Header?.ToString()?.StartsWith("Resolution") == true);
+
+                var refItem = tb?.ContextMenu?.Items
+                    .OfType<MenuItem>()
+                    .FirstOrDefault(m => m.Header?.ToString()?.StartsWith("Refresh Rate") == true);
+
+                if (resItem != null)
+                    resItem.Header = width > 0 ? $"Resolution: {width} × {height}" : "Resolution: Unknown";
+
+                if (refItem != null)
+                    refItem.Header = refreshRate > 0 ? $"Refresh Rate: {refreshRate} Hz" : "Refresh Rate: Unknown";
+            }
+            catch { }
         }
 
         private void ApplySpeedFromTray(string speedKey)
@@ -206,9 +207,7 @@ Restart-NetAdapter -Name $adapterName -Confirm:$false
                 };
 
                 using (var process = System.Diagnostics.Process.Start(processInfo))
-                {
                     process?.WaitForExit();
-                }
             }
             catch { }
             finally
@@ -291,8 +290,7 @@ Restart-NetAdapter -Name $adapterName -Confirm:$false
                 await PollForIconUpdate(true);
             }
 
-            if (settingsWindow != null)
-                settingsWindow.SyncStreamingState(isStreamingModeActive, originalSpeedForStreaming);
+            settingsWindow?.SyncStreamingState(isStreamingModeActive, originalSpeedForStreaming);
         }
 
         private async Task PollForIconUpdate(bool showNotification)
@@ -357,7 +355,7 @@ Restart-NetAdapter -Name $adapterName -Confirm:$false
 
         private void MenuExit_Click(object sender, RoutedEventArgs e)
         {
-            if (tb != null) tb.Dispose();
+            tb?.Dispose();
             Application.Current.Shutdown();
         }
     }
