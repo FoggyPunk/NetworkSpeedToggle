@@ -7,7 +7,7 @@
 
 > ⚠️ **Browser Warning:** When downloading the installer, Edge or Chrome may show a security warning. This is a **false positive** caused by the lack of a paid code-signing certificate — common for open-source projects. Click **"Keep"** or **"Keep anyway"** to proceed. The source code is fully available here for inspection.
 
-<img width="406" height="514" alt="streamtweak" src="https://github.com/user-attachments/assets/d155b874-3445-4385-93be-2b820c1de04d" />
+<img width="406" height="514" alt="StreamTweak" src="https://github.com/user-attachments/assets/e89ea835-f66b-45d7-bcfc-9373f6f03d14" />
 
 ## 🚀 The ReBrand: From Network Speed Toggle to StreamTweak 🎮
 The project originally started as **Network Speed Toggle**, a utility focused exclusively on solving a specific issue in the cloud gaming community: Ethernet link speed mismatches (e.g., Host at 2.5 Gbps and Client at 1 Gbps) causing stuttering and UDP packet loss on unmanaged switches.
