@@ -7,31 +7,41 @@
 
 > ⚠️ **Browser Warning:** When downloading the installer, Edge or Chrome may show a security warning. This is a **false positive** caused by the lack of a paid code-signing certificate — common for open-source projects. Click **"Keep"** or **"Keep anyway"** to proceed. The source code is fully available here for inspection.
 
-<img width="406" height="514" alt="streamtweak" src="https://github.com/user-attachments/assets/d155b874-3445-4385-93be-2b820c1de04d" />
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/4a9e962e-bd7c-4d6b-bf79-807247c11d1a">
+  <source media="(prefers-color-scheme: light)" srcset="https://github.com/user-attachments/assets/87629fe0-bef9-463b-af88-d87225868005">
+  <img width="458" height="580" alt="streamtweak" src="https://github.com/user-attachments/assets/87629fe0-bef9-463b-af88-d87225868005" />
+</picture>
 
 ## 🚀 The ReBrand: From Network Speed Toggle to StreamTweak 🎮
 The project originally started as **Network Speed Toggle**, a utility focused on solving a specific issue in the cloud gaming community: Ethernet link speed mismatches (e.g., Host at 2.5 Gbps and Client at 1 Gbps) causing stuttering and UDP packet loss on unmanaged switches.
 
-With **Version 2.0**, the project has evolved.
+With **Version 2.0**, the project has evolved into a full streaming companion app.
+
+## ✨ What's New in Version 2.5.1 — The "Silent Power Update"
+The biggest quality-of-life upgrade yet: **StreamTweak is now completely UAC-free during normal use.**
+
+Previous versions had to request administrator privileges every time the network speed changed — whether triggered manually, by the tray menu, or automatically by Auto Streaming Mode. This meant a UAC dialog interrupting the experience at the worst possible moments.
+
+**Version 2.5.1 eliminates this entirely** by introducing a lightweight background Windows Service (`StreamTweakService`) that is installed alongside the app. The service runs with `LocalSystem` privileges and listens for commands from the main app via a Named Pipe. When a speed change is needed, the app sends a silent request to the service — no elevation prompt, no interruption.
+
+- **Zero UAC prompts** during Manual Mode, Auto Mode, or tray menu speed changes
+- **Clean privilege separation:** the UI process stays unprivileged; only the service touches the adapter
+- **Graceful fallback:** if running from source without the installer, the app falls back to the standard UAC prompt automatically
+- **Fully managed lifecycle:** the service is created on install and removed cleanly on uninstall
 
 ## ✨ What's New in Version 2.5.0
-- **Enhanced Auto Streaming Mode:** Improved monitoring logic and state synchronization
-- **Redesigned Settings UI:** Professional modern layout with toggle switch styled after Windows 11
+- **Auto Streaming Mode:** StreamTweak monitors Sunshine/Apollo logs and automatically adjusts network speed when Moonlight connects
+- **Redesigned Settings UI:** Professional modern layout with Windows 11-style toggle switch
 - **Intelligent Alert System:** 4-second awareness delay before network changes, auto-dismissal after 8 seconds
-- **Better State Management:** Seamless coordination between Auto Mode and Manual Mode controls
-- **Improved Stability:** Enhanced error handling and resource cleanup
-
-**Previous v2.0 Features Still Included:**
-- Total Rebrand with modern icon
-- Manual Streaming Control button
-- Hardware Monitor (resolution, refresh rate, GPU info)
+- **Better State Management:** Seamless coordination between Auto Mode and Manual Mode
 
 ## 📖 The Technical Story Behind This Project
 This project was born out of a specific frustration in the cloud gaming community. When using game streaming software like **[Moonlight](https://github.com/moonlight-stream/moonlight-qt)** with **Sunshine** or **Apollo**, a known issue occurs if the host PC and the client have mismatched Ethernet link speeds.
 
 Due to how UDP packet buffering works on network switches, this mismatch often leads to severe packet loss and "Slow connection to PC" errors. You can read more about this technical bottleneck on the **[Moonlight GitHub Issue #714](https://github.com/moonlight-stream/moonlight-qt/issues/714)** and in this highly discussed **[Reddit thread](https://www.reddit.com/r/MoonlightStreaming/comments/1m35zo7/fix_moonlight_streaming_issues_on_25gbps_lan_try/)**.
 
-StreamTweak makes the workaround (throttling the Host PC's Ethernet adapter down to 1.0 Gbps) instantaneous, and it looks forward to adding more features to streamline the remote gaming experience.
+StreamTweak makes the workaround (throttling the Host PC's Ethernet adapter down to 1.0 Gbps) instantaneous and completely seamless — no interruptions, no prompts.
 
 *Fun fact: This entire application, including the C# code, UI logic, and Inno Setup installer, was developed with the assistance of AI.*
 
@@ -42,8 +52,18 @@ StreamTweak makes the workaround (throttling the Host PC's Ethernet adapter down
 - **Auto Streaming Mode:** Intelligently monitors Sunshine/Apollo logs for incoming Moonlight connections and auto-adjusts network speed.
 - **Manual Streaming Control:** One-click activation to instantly throttle to 1Gbps with professional UI feedback.
 - **Smart Notifications:** Non-intrusive on-screen alerts inform users before network changes occur.
+- **Completely UAC-free:** A background Windows Service handles all privileged operations silently — no prompts during normal use.
 - **Auto-Start:** Launches at Windows logon via a hidden Scheduled Task.
-- **UAC On-Demand:** Runs silently in the background, requesting Admin privileges only when applying changes.
+
+## 🏗️ Architecture
+
+### UAC-free Speed Changes (v2.5.1+)
+StreamTweak installs a lightweight background Windows Service (`StreamTweakService`) that runs as `LocalSystem` and listens on a Named Pipe. Whenever the app needs to change the network adapter speed — whether from Auto Mode, Manual Mode, or the tray menu — it sends a command through the pipe. The service executes the change with its existing elevated privileges. No UAC dialog ever appears.
+
+```
+StreamTweak.exe  ──(Named Pipe)──►  StreamTweakService  ──►  Network Adapter
+ (unprivileged)                        (LocalSystem)
+```
 
 ## 🎮 How It Works
 
@@ -67,12 +87,12 @@ StreamTweak makes the workaround (throttling the Host PC's Ethernet adapter down
 ### Manual Streaming Mode
 1. Click "Start Streaming Mode" button anytime
 2. On-screen alert informs you of the network adjustment
-3. Network throttles to 1Gbps immediately
+3. Network throttles to 1Gbps immediately — no UAC prompt
 4. Click "Stop Streaming Mode" to restore original speed
 
 ## 📝 Installation
 1. Go to the **Releases** page of this repository.
-2. Download the latest `StreamTweak_2.5.0_Installer.exe`
+2. Download the latest `StreamTweak_2.5.1_Installer.exe`
 3. Run the installer and enjoy seamless streaming.
 
 ## 🙏 Support the Project

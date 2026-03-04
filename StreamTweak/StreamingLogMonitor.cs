@@ -10,7 +10,6 @@ namespace StreamTweak
     /// </summary>
     public class StreamingLogMonitor : IDisposable
     {
-        private FileSystemWatcher? logWatcher;
         private StreamReader? logStreamReader;
         private string? currentLogFilePath;
         private Task? monitoringTask;
@@ -43,7 +42,6 @@ namespace StreamTweak
 
             try
             {
-                // Start async monitoring
                 cancellationTokenSource = new CancellationTokenSource();
                 monitoringTask = MonitorLogFileAsync(cancellationTokenSource.Token);
             }
@@ -61,8 +59,6 @@ namespace StreamTweak
             try
             {
                 cancellationTokenSource?.Cancel();
-                logWatcher?.Dispose();
-                logWatcher = null;
                 logStreamReader?.Dispose();
                 logStreamReader = null;
             }
@@ -79,31 +75,27 @@ namespace StreamTweak
 
             try
             {
-                // Open the log file and seek to the end to start monitoring from new entries
-                using (var fileStream = new FileStream(currentLogFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                using var fileStream = new FileStream(currentLogFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                fileStream.Seek(0, SeekOrigin.End);
+                logStreamReader = new StreamReader(fileStream);
+
+                while (!cancellationToken.IsCancellationRequested)
                 {
-                    fileStream.Seek(0, SeekOrigin.End);
-                    logStreamReader = new StreamReader(fileStream);
+                    string? line = await logStreamReader.ReadLineAsync();
 
-                    while (!cancellationToken.IsCancellationRequested)
+                    if (line != null)
                     {
-                        string? line = await logStreamReader.ReadLineAsync();
+                        LogParser.StreamingEvent streamingEvent = LogParser.ParseLogLine(line);
 
-                        if (line != null)
+                        if (streamingEvent != LogParser.StreamingEvent.None)
                         {
-                            LogParser.StreamingEvent streamingEvent = LogParser.ParseLogLine(line);
-
-                            if (streamingEvent != LogParser.StreamingEvent.None)
-                            {
-                                DebugLog($"Event raised: {streamingEvent}");
-                                StreamingEventDetected?.Invoke(this, new StreamingEventArgs { Event = streamingEvent });
-                            }
+                            DebugLog($"Event raised: {streamingEvent}");
+                            StreamingEventDetected?.Invoke(this, new StreamingEventArgs { Event = streamingEvent });
                         }
-                        else
-                        {
-                            // No new lines, wait before checking again
-                            await Task.Delay(500, cancellationToken);
-                        }
+                    }
+                    else
+                    {
+                        await Task.Delay(500, cancellationToken);
                     }
                 }
             }
@@ -116,17 +108,12 @@ namespace StreamTweak
 
         public void Dispose()
         {
-            if (isDisposed)
-                return;
-
+            if (isDisposed) return;
             StopMonitoring();
             cancellationTokenSource?.Dispose();
             isDisposed = true;
         }
 
-        /// <summary>
-        /// Logs debug information to a file
-        /// </summary>
         private static void DebugLog(string message)
         {
             try
@@ -134,7 +121,6 @@ namespace StreamTweak
                 string debugLogPath = Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                     "StreamTweak", "debug.log");
-
                 Directory.CreateDirectory(Path.GetDirectoryName(debugLogPath) ?? "");
                 File.AppendAllText(debugLogPath, $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] {message}{Environment.NewLine}");
             }

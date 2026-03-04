@@ -4,16 +4,36 @@ StreamTweak - ChangeLog - Developed by FoggyPunk
 
 https://github.com/FoggyPunk/StreamTweak
 
-Version 2.5.0 - The "Smart Streaming Update" (2026)
+Version 2.5.1 - The "Silent Power Update" (04/03/2026)
 ------------------------------------------
 ✨ NEW FEATURES:
-• Auto Streaming Mode: Monitor Sunshine/Apollo logs and automatically adjust network speed to 1Gbps when Moonlight connects
-• Smart Toggle Control: Enable/disable Auto Streaming Mode with an elegant toggle switch
-• Streaming Adjustment Alert: Professional on-screen notification with 4-second delay before network changes occur
-• Intelligent State Sync: Auto Streaming Mode and manual controls work seamlessly together
+• StreamTweakService: Windows Service (LocalSystem) handling all network speed
+  changes with elevated privileges -- no UAC prompts, ever
+• Named Pipe IPC: secure communication between app and service, keeping the
+  privilege boundary clean and UX uninterrupted
 
 🔧 IMPROVEMENTS:
-• Completely redesigned Settings UI with modern layout (460x420px)
+• No UAC prompts in Manual Mode, Auto Mode, and tray menu
+• Automatic fallback to UAC prompt if the service is unavailable
+• Service lifecycle fully managed by the installer
+
+🐛 STABILITY & FIXES:
+• Minor bug fixes
+
+Version 2.5.0 - The "Smart Streaming Update" (04/03/2026)
+------------------------------------------
+✨ NEW FEATURES:
+• Auto Streaming Mode: Monitor Sunshine/Apollo logs and automatically
+  adjust network speed to 1Gbps when Moonlight connects
+• Smart Toggle Control: Enable/disable Auto Streaming Mode with an
+  elegant toggle switch
+• Streaming Adjustment Alert: Professional on-screen notification with 
+  4-second delay before network changes occur
+• Intelligent State Sync: Auto Streaming Mode and manual controls work
+  seamlessly together
+
+🔧 IMPROVEMENTS:
+• Completely redesigned Settings UI with modern layout
 • Compact messaging system with unified color scheme
 • Event-driven architecture for responsive UI updates
 
@@ -26,7 +46,8 @@ Version 2.5.0 - The "Smart Streaming Update" (2026)
 Version 2.0 - The "ReBrand Update" (02/03/2026)
 ------------------------------------------
 ✨ NEW FEATURES:
-• Streaming Mode: Automatically throttles network to 1.0 Gbps on activation and restores previous speed when disabled
+• Streaming Mode: Automatically throttles network to 1.0 Gbps on activation 
+  and restores previous speed when disabled
 • Displays current monitor resolution and refresh rate of the Host PC
 • Shows installed GPU model for quick hardware reference
 

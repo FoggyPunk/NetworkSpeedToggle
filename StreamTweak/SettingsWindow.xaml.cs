@@ -34,8 +34,8 @@ namespace StreamTweak
         public event EventHandler? StreamingModeChanged;
         public event EventHandler? AutoStreamingEnabledChanged;
 
-        private static readonly SolidColorBrush StreamingStartBrush = new SolidColorBrush(Color.FromRgb(168, 213, 162));
-        private static readonly SolidColorBrush StreamingStopBrush = new SolidColorBrush(Color.FromRgb(244, 168, 168));
+        private static readonly SolidColorBrush StreamingStartBrush    = new SolidColorBrush(Color.FromRgb(168, 213, 162));
+        private static readonly SolidColorBrush StreamingStopBrush     = new SolidColorBrush(Color.FromRgb(244, 168, 168));
         private static readonly SolidColorBrush StreamingDisabledBrush = new SolidColorBrush(Color.FromRgb(180, 180, 180));
 
         public SettingsWindow()
@@ -69,6 +69,12 @@ namespace StreamTweak
 
             if (isStreamingMode && SpeedComboBox.Items.Contains("1.0 Gbps Full Duplex"))
                 SpeedComboBox.SelectedItem = "1.0 Gbps Full Duplex";
+        }
+
+        public void RefreshCurrentSpeedDisplay()
+        {
+            if (!string.IsNullOrEmpty(currentAdapterName))
+                UpdateCurrentSpeedDisplay(currentAdapterName);
         }
 
         private void UpdateStreamingButtonAppearance()
@@ -157,23 +163,23 @@ namespace StreamTweak
             if (isDarkMode)
             {
                 this.Resources["WindowBackground"] = new SolidColorBrush(Color.FromRgb(32, 32, 32));
-                this.Resources["PanelBackground"] = new SolidColorBrush(Color.FromRgb(45, 45, 45));
-                this.Resources["TextForeground"] = new SolidColorBrush(Colors.White);
-                this.Resources["BorderColor"] = new SolidColorBrush(Color.FromRgb(60, 60, 60));
-                Application.Current.Resources["PanelBackground"] = new SolidColorBrush(Color.FromRgb(45, 45, 45));
-                Application.Current.Resources["TextForeground"] = new SolidColorBrush(Colors.White);
-                Application.Current.Resources["BorderColor"] = new SolidColorBrush(Color.FromRgb(60, 60, 60));
+                this.Resources["PanelBackground"]  = new SolidColorBrush(Color.FromRgb(45, 45, 45));
+                this.Resources["TextForeground"]   = new SolidColorBrush(Colors.White);
+                this.Resources["BorderColor"]      = new SolidColorBrush(Color.FromRgb(60, 60, 60));
+                Application.Current.Resources["PanelBackground"]  = new SolidColorBrush(Color.FromRgb(45, 45, 45));
+                Application.Current.Resources["TextForeground"]   = new SolidColorBrush(Colors.White);
+                Application.Current.Resources["BorderColor"]      = new SolidColorBrush(Color.FromRgb(60, 60, 60));
                 ThemeToggleButton.Content = "☀️ Light Mode";
             }
             else
             {
                 this.Resources["WindowBackground"] = new SolidColorBrush(Color.FromRgb(243, 243, 243));
-                this.Resources["PanelBackground"] = new SolidColorBrush(Colors.White);
-                this.Resources["TextForeground"] = new SolidColorBrush(Color.FromRgb(32, 32, 32));
-                this.Resources["BorderColor"] = new SolidColorBrush(Color.FromRgb(209, 209, 209));
-                Application.Current.Resources["PanelBackground"] = new SolidColorBrush(Colors.White);
-                Application.Current.Resources["TextForeground"] = new SolidColorBrush(Color.FromRgb(32, 32, 32));
-                Application.Current.Resources["BorderColor"] = new SolidColorBrush(Color.FromRgb(209, 209, 209));
+                this.Resources["PanelBackground"]  = new SolidColorBrush(Colors.White);
+                this.Resources["TextForeground"]   = new SolidColorBrush(Color.FromRgb(32, 32, 32));
+                this.Resources["BorderColor"]      = new SolidColorBrush(Color.FromRgb(209, 209, 209));
+                Application.Current.Resources["PanelBackground"]  = new SolidColorBrush(Colors.White);
+                Application.Current.Resources["TextForeground"]   = new SolidColorBrush(Color.FromRgb(32, 32, 32));
+                Application.Current.Resources["BorderColor"]      = new SolidColorBrush(Color.FromRgb(209, 209, 209));
                 ThemeToggleButton.Content = "🌙 Dark Mode";
             }
 
@@ -217,6 +223,20 @@ namespace StreamTweak
                                  ?? new Dictionary<string, object>();
                 configData["StreamingMode"] = streamingMode;
                 configData["OriginalSpeed"] = originalSpeedKey;
+                File.WriteAllText(configFilePath,
+                    JsonSerializer.Serialize(configData, new JsonSerializerOptions { WriteIndented = true }));
+            }
+            catch { }
+        }
+
+        private void SaveAutoStreamingStateToConfig()
+        {
+            try
+            {
+                string json = File.Exists(configFilePath) ? File.ReadAllText(configFilePath) : "{}";
+                var configData = JsonSerializer.Deserialize<Dictionary<string, object>>(json)
+                                 ?? new Dictionary<string, object>();
+                configData["AutoStreamingEnabled"] = isAutoStreamingEnabled;
                 File.WriteAllText(configFilePath,
                     JsonSerializer.Serialize(configData, new JsonSerializerOptions { WriteIndented = true }));
             }
@@ -366,17 +386,28 @@ namespace StreamTweak
                 foreach (var speedKey in currentAdapterSpeeds.Keys)
                     if (speedKey != null) SpeedComboBox.Items.Add(speedKey);
 
-                // Try to select 1Gbps as default, otherwise select first item
+                // Default selection: match the actual current link speed of the adapter,
+                // not a hardcoded preference — prevents originalSpeed from being set wrongly
                 int selectedIndex = 0;
-                for (int i = 0; i < SpeedComboBox.Items.Count; i++)
+                try
                 {
-                    string item = SpeedComboBox.Items[i]?.ToString() ?? string.Empty;
-                    if (item.Contains("1") && item.Contains("Gbps"))
+                    var ni = NetworkInterface.GetAllNetworkInterfaces()
+                        .FirstOrDefault(a => a.Name == adapterName && a.OperationalStatus == OperationalStatus.Up);
+                    if (ni != null)
                     {
-                        selectedIndex = i;
-                        break;
+                        long mbps = ni.Speed / 1_000_000;
+                        for (int i = 0; i < SpeedComboBox.Items.Count; i++)
+                        {
+                            string item = SpeedComboBox.Items[i]?.ToString()?.ToLower() ?? string.Empty;
+                            bool match = mbps >= 2000
+                                ? item.Contains("2.5") || item.Contains("2500")
+                                : item.Contains(mbps.ToString());
+                            if (match) { selectedIndex = i; break; }
+                        }
                     }
                 }
+                catch { }
+
                 SpeedComboBox.SelectedIndex = selectedIndex;
             }
             else
@@ -387,6 +418,7 @@ namespace StreamTweak
             }
         }
 
+        // Applies a speed change via SpeedChanger (UAC-free if service is running, UAC fallback otherwise)
         private void ApplySpeedInternal(string speedKey)
         {
             if (currentAdapterSpeeds == null || !currentAdapterSpeeds.ContainsKey(speedKey)) return;
@@ -394,42 +426,18 @@ namespace StreamTweak
             string selectedAdapter = AdapterComboBox.SelectedItem?.ToString() ?? string.Empty;
             if (string.IsNullOrEmpty(selectedAdapter)) return;
 
-            string targetRegistryValue = currentAdapterSpeeds[speedKey];
-            string tempScriptPath = Path.Combine(Path.GetTempPath(), "NetSpeedChanger.ps1");
-            string psScript = $@"
-$adapterName = '{selectedAdapter}'
-$registryValue = '{targetRegistryValue}'
-Set-NetAdapterAdvancedProperty -Name $adapterName -RegistryKeyword '*SpeedDuplex' -RegistryValue $registryValue -NoRestart
-Restart-NetAdapter -Name $adapterName -Confirm:$false
-";
-            File.WriteAllText(tempScriptPath, psScript);
+            string registryValue = currentAdapterSpeeds[speedKey];
+            bool success;
 
-            try
+            if (SpeedChanger.IsTaskInstalled())
+                success = SpeedChanger.Apply(selectedAdapter, registryValue);
+            else
+                success = SpeedChanger.ApplyWithUac(selectedAdapter, registryValue);
+
+            if (success)
             {
-                var processInfo = new System.Diagnostics.ProcessStartInfo
-                {
-                    FileName = "powershell.exe",
-                    Arguments = $"-ExecutionPolicy Bypass -WindowStyle Hidden -File \"{tempScriptPath}\"",
-                    UseShellExecute = true,
-                    Verb = "runas",
-                    CreateNoWindow = true
-                };
-
-                using (var process = System.Diagnostics.Process.Start(processInfo))
-                    process?.WaitForExit();
-
                 HasAppliedChanges = true;
                 SpeedApplied?.Invoke(this, EventArgs.Empty);
-            }
-            catch (System.ComponentModel.Win32Exception)
-            {
-                MessageBox.Show("Administrator privileges are required to change network adapter speeds.",
-                    "Access Denied", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-            finally
-            {
-                if (File.Exists(tempScriptPath))
-                    try { File.Delete(tempScriptPath); } catch { }
             }
         }
 
@@ -466,8 +474,28 @@ Restart-NetAdapter -Name $adapterName -Confirm:$false
 
             if (!isStreamingMode)
             {
-                if (SpeedComboBox.SelectedItem != null)
-                    originalSpeed = SpeedComboBox.SelectedItem.ToString() ?? string.Empty;
+                // Determine original speed from actual adapter speed — not from ComboBox selection.
+                // The ComboBox default may not match the real current speed, which would cause
+                // Stop Streaming Mode to attempt restoring the wrong speed.
+                string? detectedOriginalSpeed = null;
+                if (currentAdapterSpeeds != null)
+                {
+                    var ni = NetworkInterface.GetAllNetworkInterfaces()
+                        .FirstOrDefault(a => a.Name == selectedAdapter && a.OperationalStatus == OperationalStatus.Up);
+                    if (ni != null)
+                    {
+                        long mbps = ni.Speed / 1_000_000;
+                        foreach (var kvp in currentAdapterSpeeds)
+                        {
+                            string kl = kvp.Key.ToLower();
+                            bool match = mbps >= 2000
+                                ? kl.Contains("2.5") || kl.Contains("2500")
+                                : kl.Contains(mbps.ToString());
+                            if (match) { detectedOriginalSpeed = kvp.Key; break; }
+                        }
+                    }
+                }
+                originalSpeed = detectedOriginalSpeed ?? SpeedComboBox.SelectedItem?.ToString() ?? string.Empty;
 
                 string? oneGbpsKey = null;
                 if (currentAdapterSpeeds != null)
@@ -554,27 +582,5 @@ Restart-NetAdapter -Name $adapterName -Confirm:$false
             SaveAutoStreamingStateToConfig();
             AutoStreamingEnabledChanged?.Invoke(this, EventArgs.Empty);
         }
-
-        private void SaveAutoStreamingStateToConfig()
-        {
-            try
-            {
-                string json = File.Exists(configFilePath) ? File.ReadAllText(configFilePath) : "{}";
-                var configData = JsonSerializer.Deserialize<Dictionary<string, object>>(json)
-                                 ?? new Dictionary<string, object>();
-                configData["AutoStreamingEnabled"] = isAutoStreamingEnabled;
-                File.WriteAllText(configFilePath,
-                    JsonSerializer.Serialize(configData, new JsonSerializerOptions { WriteIndented = true }));
-            }
-            catch { }
-        }
-
-        public void RefreshCurrentSpeedDisplay()
-        {
-            if (!string.IsNullOrEmpty(currentAdapterName))
-            {
-                UpdateCurrentSpeedDisplay(currentAdapterName);
-            }
-        }
-     }
+    }
 }

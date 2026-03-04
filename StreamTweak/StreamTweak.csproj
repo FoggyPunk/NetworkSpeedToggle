@@ -11,6 +11,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<!-- DisplayHelper.cs removed — HDR and display monitoring no longer used -->
+		<Compile Remove="DisplayHelper.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<None Remove="Resources\streammodeko.ico" />
 		<None Remove="Resources\streammodeok.ico" />
 		<None Remove="Resources\streamtweak.ico" />
@@ -18,10 +23,10 @@
 
 	<ItemGroup>
 		<Content Include="Resources\streammodeko.ico">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<Content Include="Resources\streammodeok.ico">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<Content Include="Resources\streamtweak.ico">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -31,6 +36,7 @@
 	<ItemGroup>
 		<PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="2.0.1" />
 		<PackageReference Include="Microsoft.Management.Infrastructure" Version="3.0.0" />
+		<PackageReference Include="System.ServiceProcess.ServiceController" Version="8.0.0" />
 	</ItemGroup>
 
 </Project>

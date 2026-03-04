@@ -11,9 +11,6 @@
                     <MenuItem Header="Settings..." Click="MenuSettings_Click" FontWeight="Bold"/>
                     <MenuItem Header="Start Streaming Mode" Click="MenuStreamingMode_Click"/>
                     <Separator/>
-                    <MenuItem Header="Resolution: —" IsEnabled="False"/>
-                    <MenuItem Header="Refresh Rate: —" IsEnabled="False"/>
-                    <Separator/>
                     <MenuItem Header="Exit" Click="MenuExit_Click"/>
                 </ContextMenu>
             </tb:TaskbarIcon.ContextMenu>
