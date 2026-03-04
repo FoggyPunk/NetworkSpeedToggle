@@ -1,8 +1,8 @@
 ; =====================================================
-; StreamTweak v2.0 - GitHub Release Installer
+; StreamTweak v2.5.0 - GitHub Release Installer
 ; =====================================================
 #define MyAppName "StreamTweak"
-#define MyAppVersion "2.0"
+#define MyAppVersion "2.5.0"
 #define MyAppPublisher "FoggyPunk"
 #define MyAppExeName "StreamTweak.exe"
 #define MyAppURL "https://github.com/FoggyPunk/StreamTweak"
@@ -17,9 +17,9 @@ AppPublisher={#MyAppPublisher}
 DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 InfoBeforeFile=changelog.txt
-SetupIconFile=Resources\streamtweak.ico
-WizardSmallImageFile=Resources\streamtweak.bmp
-WizardImageFile=Resources\streamtweakinstaller.bmp
+SetupIconFile=StreamTweak\Resources\streamtweak.ico
+WizardSmallImageFile=StreamTweak\Resources\streamtweak.bmp
+WizardImageFile=StreamTweak\Resources\streamtweakinstaller.bmp
 UninstallDisplayIcon={app}\Resources\streamtweak.ico
 AllowNoIcons=yes
 DirExistsWarning=no
@@ -43,9 +43,9 @@ WelcomeLabel2=
 Name: "autostart"; Description: "Start {#MyAppName} automatically when Windows starts"; GroupDescription: "Auto-start Options:"; Flags: checkedonce
 
 [Files]
-Source: "bin\Release\net8.0-windows7.0\win-x64\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "Resources\*"; DestDir: "{app}\Resources"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "Resources\streamtweak.bmp"; Flags: dontcopy
+Source: "StreamTweak\bin\Release\net8.0-windows7.0\win-x64\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "StreamTweak\Resources\*"; DestDir: "{app}\Resources"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "StreamTweak\Resources\streamtweak.bmp"; Flags: dontcopy
 Source: "changelog.txt"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
