@@ -244,7 +244,7 @@ namespace StreamTweak
 
                 var alert = new StreamingAdjustmentAlert();
                 alert.Show();
-                await Task.Delay(4000);
+                await Task.Delay(7900);
 
                 isStreamingModeActive = true;
                 SaveStreamingStateToConfig(true, originalSpeedForStreaming);

@@ -195,19 +195,19 @@
         </Grid>
 
         <!-- Adapter -->
-        <TextBlock Text="Select Physical Network Adapter:" FontWeight="Medium" Margin="0,0,0,5" Grid.Row="1"/>
+        <TextBlock Text="Select Physical Network Adapter" FontWeight="Medium" Margin="0,0,0,5" Grid.Row="1"/>
         <ComboBox x:Name="AdapterComboBox" Margin="0,0,0,10" Grid.Row="2"
                   SelectionChanged="AdapterComboBox_SelectionChanged"/>
 
         <!-- Current Speed -->
         <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,10">
-            <TextBlock Text="Current Speed:" FontWeight="Medium" Margin="0,0,10,0"/>
+            <TextBlock Text="Current Speed" FontWeight="Medium" Margin="0,0,10,0"/>
             <TextBlock x:Name="CurrentSpeedTextBlock" Text="Detecting..." FontWeight="Bold"
                        Foreground="{DynamicResource AccentColor}"/>
         </StackPanel>
 
         <!-- Target Speed -->
-        <TextBlock Text="Target Link Speed:" FontWeight="Medium" Margin="0,0,0,5" Grid.Row="4"/>
+        <TextBlock Text="Target Link Speed" FontWeight="Medium" Margin="0,0,0,5" Grid.Row="4"/>
         <ComboBox x:Name="SpeedComboBox" Margin="0,0,0,10" Grid.Row="5"/>
 
         <!-- Separator -->
@@ -227,13 +227,13 @@
 
         <StackPanel Grid.Row="8" Orientation="Vertical" Margin="0,12,0,0">
             <TextBlock FontSize="9" Foreground="#FF808080" TextWrapping="Wrap" TextAlignment="Center" Margin="0,0,0,2" LineHeight="14">
-                <Run Text="Auto-sets network speed to 1Gbps when Moonlight streams."/>
+                <Run Text="Auto-sets network speed to 1Gbps when Moonlight streams"/>
             </TextBlock>
             <TextBlock FontSize="9" Foreground="#FF808080" TextWrapping="Wrap" TextAlignment="Center" Margin="0,0,0,2" LineHeight="14">
-                <Run Text="⚠️ Disconnect may occur if speed adjustment is needed. Reconnect manually if required."/>
+                <Run Text="⚠️ Disconnect may occur if speed adjustment is needed - Reconnect manually if required"/>
             </TextBlock>
             <TextBlock FontSize="9" Foreground="#FF808080" TextWrapping="Wrap" TextAlignment="Center" Margin="0,0,0,0" LineHeight="14">
-                <Run Text="Requires Sunshine/Apollo in default installation folders."/>
+                <Run Text="Requires Sunshine/Apollo in default installation folders"/>
             </TextBlock>
         </StackPanel>
 
@@ -248,7 +248,6 @@
                     Click="StreamingModeButton_Click" Style="{StaticResource ModernButton}"
                     HorizontalAlignment="Left">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <Image Source="pack://application:,,,/Resources/streammodeok.ico" Width="16" Height="16" Margin="0,0,8,0"/>
                     <TextBlock Text="Start Streaming Mode" VerticalAlignment="Center"/>
                 </StackPanel>
             </Button>
@@ -260,7 +259,7 @@
 
         <!-- Info Text -->
         <StackPanel Grid.Row="10" Orientation="Vertical" HorizontalAlignment="Center" Margin="0,6,0,0" VerticalAlignment="Center">
-            <TextBlock Text="Streaming Mode auto-sets the Target Link Speed to 1Gbps. Stop to revert to original Speed." 
+            <TextBlock Text="Streaming Mode auto-sets the Target Link Speed to 1Gbps. Stop to revert to original Speed" 
                        FontSize="9" Foreground="#FF808080" TextAlignment="Center" Margin="0,0,0,0"/>
         </StackPanel>
     </Grid>
