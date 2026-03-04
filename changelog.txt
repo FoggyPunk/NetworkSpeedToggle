@@ -4,16 +4,36 @@ StreamTweak - ChangeLog - Developed by FoggyPunk
 
 https://github.com/FoggyPunk/StreamTweak
 
+Version 2.5.0 - The "Smart Streaming Update" (2026)
+------------------------------------------
+✨ NEW FEATURES:
+• Auto Streaming Mode: Monitor Sunshine/Apollo logs and automatically adjust network speed to 1Gbps when Moonlight connects
+• Smart Toggle Control: Enable/disable Auto Streaming Mode with an elegant toggle switch
+• Streaming Adjustment Alert: Professional on-screen notification with 4-second delay before network changes occur
+• Intelligent State Sync: Auto Streaming Mode and manual controls work seamlessly together
+
+🔧 IMPROVEMENTS:
+• Completely redesigned Settings UI with modern layout (460x420px)
+• Compact messaging system with unified color scheme
+• Event-driven architecture for responsive UI updates
+
+🐛 STABILITY & FIXES:
+• Improved error handling for missing Sunshine/Apollo installations
+• Better synchronization between settings window and background service
+• Graceful fallback when streaming service is unavailable
+• Proper cleanup of monitoring resources
+
 Version 2.0 - The "ReBrand Update" (02/03/2026)
 ------------------------------------------
 ✨ NEW FEATURES:
-• Streaming Mode allow to automatically throttles network to 1.0 Gbps on activation and restores your previous speed when disabled.
+• Streaming Mode: Automatically throttles network to 1.0 Gbps on activation and restores previous speed when disabled
 • Displays current monitor resolution and refresh rate of the Host PC
 • Shows installed GPU model for quick hardware reference
 
 🔧 IMPROVEMENTS:
-• NetworkSpeedToggle has officially "evolved" into StreamTweak 💻<->💻
-• Introduced a new app icon that better captures the new spirit: a fresh look for a smarter tool 🚀
+• NetworkSpeedToggle officially evolved into StreamTweak 💻<->💻
+• New modern app icon capturing the project's fresh spirit
+• Modern Windows 11 UI with rounded corners and professional design
 
 Version 1.2.2 - The "Lightweight" Update (02/03/2026)
 ------------------------------------------

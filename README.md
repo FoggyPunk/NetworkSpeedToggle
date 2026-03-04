@@ -1,64 +1,82 @@
-# Network Speed Toggle
+# StreamTweak
 ![Platform](https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-blue.svg)
 ![Framework](https://img.shields.io/badge/Framework-.NET%208.0-purple.svg)
+![Downloads](https://img.shields.io/github/downloads/foggypunk/StreamTweak/total?label=Downloads)
 
-A WPF system tray app that lets you **switch between ALL supported Ethernet speeds** (100/1000/2.5G/5G/10G) with one click - no more manual adapter settings.
+**StreamTweak** is born to solve technical bottlenecks between Host and Client, offering an intelligent control center to manage your remote gaming PC with a single click.
 
-> ⚠️ **Browser Warning:** When downloading the installer, Edge or Chrome may show a warning saying the file could be harmful. This is a **false positive** caused by the lack of a paid code-signing certificate — common for new open-source projects. Click **"Keep anyway"** (Edge) or **"Keep"** (Chrome) to proceed. The source code is fully available here for inspection.
+> ⚠️ **Browser Warning:** When downloading the installer, Edge or Chrome may show a security warning. This is a **false positive** caused by the lack of a paid code-signing certificate — common for open-source projects. Click **"Keep"** or **"Keep anyway"** to proceed. The source code is fully available here for inspection.
 
-<table>
-  <tr>
-    <td><strong>Light Mode</strong></td>
-    <td><strong>Dark Mode</strong></td>
-  </tr>
-  <tr>
-    <td><img src="https://github.com/user-attachments/assets/e2ef2526-dbfc-4ff8-82f7-9263a10eca1e" width="350"/></td>
-    <td><img src="https://github.com/user-attachments/assets/d5b0ad14-1a3f-4c43-befa-85c13c706176" width="350"/></td>
-  </tr>
-</table>
+<img width="406" height="514" alt="streamtweak" src="https://github.com/user-attachments/assets/d155b874-3445-4385-93be-2b820c1de04d" />
 
-## 🔧 What's New in Version 1.2.2
-- Switched from self-contained to framework-dependent build Installer size reduced from ~50MB to ~3MB
-- Automatic .NET 8 runtime installation: if not already present on the target machine, the installer will silently download and install it before proceeding
+## 🚀 The ReBrand: From Network Speed Toggle to StreamTweak 🎮
+The project originally started as **Network Speed Toggle**, a utility focused on solving a specific issue in the cloud gaming community: Ethernet link speed mismatches (e.g., Host at 2.5 Gbps and Client at 1 Gbps) causing stuttering and UDP packet loss on unmanaged switches.
 
-## ✨ What's New in Version 1.2
-- **Real-time speed indicator:** The Settings window now shows your current link speed live.
-- **Modern Windows 11 UI:** Rounded corners, clean layout, and a fully custom ComboBox design.
-- **Complete Dark/Light theme:** Theme switching now covers the title bar, dropdowns, and all UI elements.
-- **Automatic accent color detection:** The UI adapts to your Windows personalization color automatically.
-- **Persistent config:** The app remembers your selected adapter and theme preference across restarts.
-- **Physical adapters only:** No VPNs, no virtual adapters, no filters needed — just your real hardware.
+With **Version 2.0**, the project has evolved.
 
-## 📖 The Story Behind This Project
-This is an amateur, open-source project born out of a specific frustration in the cloud gaming community. When using game streaming software like **[Moonlight](https://github.com/moonlight-stream/moonlight-qt)** with **[Sunshine](https://github.com/LizardByte/Sunshine)** (or its fork **[Apollo](https://github.com/ClassicOldSong/Apollo)**), a known issue occurs if the host PC and the client have mismatched Ethernet link speeds (e.g., the Host is connected at 2.5 Gbps while the Client/Switch is at 1 Gbps).
+## ✨ What's New in Version 2.5.0
+- **Enhanced Auto Streaming Mode:** Improved monitoring logic and state synchronization
+- **Redesigned Settings UI:** Professional modern layout with toggle switch styled after Windows 11
+- **Intelligent Alert System:** 4-second awareness delay before network changes, auto-dismissal after 8 seconds
+- **Better State Management:** Seamless coordination between Auto Mode and Manual Mode controls
+- **Improved Stability:** Enhanced error handling and resource cleanup
 
-Due to how UDP packet buffering works on network switches, this mismatch often leads to severe packet loss, stuttering, and "Slow connection to PC" errors. You can read more about this technical bottleneck on the [Moonlight GitHub Issue #714](https://github.com/moonlight-stream/moonlight-qt/issues/714) and in this highly discussed [Reddit thread](https://www.reddit.com/r/MoonlightStreaming/comments/1m35zo7/fix_moonlight_streaming_issues_on_25gbps_lan_try/).
+**Previous v2.0 Features Still Included:**
+- Total Rebrand with modern icon
+- Manual Streaming Control button
+- Hardware Monitor (resolution, refresh rate, GPU info)
 
-The most effective workaround is to manually throttle the Host PC's Ethernet adapter down to 1.0 Gbps before starting a streaming session. Since doing this manually through Windows Device Manager every time is tedious, I created **Network Speed Toggle** to make the switch instantaneous right from the taskbar.
+## 📖 The Technical Story Behind This Project
+This project was born out of a specific frustration in the cloud gaming community. When using game streaming software like **[Moonlight](https://github.com/moonlight-stream/moonlight-qt)** with **Sunshine** or **Apollo**, a known issue occurs if the host PC and the client have mismatched Ethernet link speeds.
 
-*Fun fact: This entire application, including the C# code, the Inno Setup installer, and the UI logic, was developed completely with the assistance of AI, specifically using **Perplexity Pro** powered by the **Gemini 3.1 Pro** LLM model.*
+Due to how UDP packet buffering works on network switches, this mismatch often leads to severe packet loss and "Slow connection to PC" errors. You can read more about this technical bottleneck on the **[Moonlight GitHub Issue #714](https://github.com/moonlight-stream/moonlight-qt/issues/714)** and in this highly discussed **[Reddit thread](https://www.reddit.com/r/MoonlightStreaming/comments/1m35zo7/fix_moonlight_streaming_issues_on_25gbps_lan_try/)**.
 
-## 🔥 Features
-- **Settings Dashboard:** Double-click the system tray icon to open a sleek UI to manage your adapters and speeds.
-- **Real-time Speed Indicator:** See your current hardware link speed live inside the Settings window.
-- **Dark/Light Theme:** Switch between themes with one click — title bar included.
-- **Windows Accent Color:** The UI automatically picks up your personalization color from Windows Settings.
-- **Silent & Unobtrusive:** Runs entirely in the background with zero CPU footprint.
-- **Auto-Start:** Automatically launches on Windows startup using a hidden scheduled task.
-- **Smart Validation:** Automatically filters out virtual networks, VPNs, and Wi-Fi adapters to only show physical LAN connections.
-- **Dynamic Tooltips:** Hover over the tray icon to see your real-time hardware link speed and connection status.
-- **Driver Bypass:** Automatically detects and bypasses Realtek/Intel driver localization limitations when setting link speeds.
-- **UAC On-Demand:** Runs silently in the background, only requesting Admin Privileges exactly when you apply a new speed.
+StreamTweak makes the workaround (throttling the Host PC's Ethernet adapter down to 1.0 Gbps) instantaneous, and it looks forward to adding more features to streamline the remote gaming experience.
 
-## 📝 Installation & Usage
-1. Go to the **Releases** page on the right side of this GitHub repository.
-2. Download the latest `NetworkSpeedToggle_1.2.1_Installer.exe`.
-3. Run the installer (you can choose to enable Auto-Start on Windows startup).
-4. Once running, double-click the tray icon to open the **Settings** window.
-5. Select your Ethernet adapter from the dropdown, choose your desired speed, and click **Apply Settings**. The app will handle the rest!
+*Fun fact: This entire application, including the C# code, UI logic, and Inno Setup installer, was developed with the assistance of AI.*
+
+## 🔥 Key Features
+- **Settings Dashboard:** Sleek UI to manage physical adapters and speeds.
+- **Smart Filtering:** Only shows real LAN adapters (no VPNs, Wi-Fi, or virtual adapters).
+- **Driver Bypass:** Automatically detects and bypasses Realtek/Intel driver localization limitations.
+- **Auto Streaming Mode:** Intelligently monitors Sunshine/Apollo logs for incoming Moonlight connections and auto-adjusts network speed.
+- **Manual Streaming Control:** One-click activation to instantly throttle to 1Gbps with professional UI feedback.
+- **Smart Notifications:** Non-intrusive on-screen alerts inform users before network changes occur.
+- **Auto-Start:** Launches at Windows logon via a hidden Scheduled Task.
+- **UAC On-Demand:** Runs silently in the background, requesting Admin privileges only when applying changes.
+
+## 🎮 How It Works
+
+### Auto Streaming Mode
+1. Enable "Auto Streaming Mode" in the Settings
+2. StreamTweak monitors your Sunshine/Apollo streaming server logs in real-time
+3. When Moonlight connects from a client:
+   - An on-screen alert appears (4-second delay for awareness)
+   - Network speed automatically adjusts from current speed (e.g., 2.5Gbps) down to 1Gbps
+4. **Important:** Your stream will briefly disconnect during the speed adjustment
+   - You have **30 seconds to reconnect** in Moonlight
+   - If you reconnect within this window, streaming continues normally
+   - The inactivity timer prevents the app from reverting speed prematurely (avoiding reconnection loops)
+5. When streaming ends:
+   - If no new connection is detected within 30 seconds, original speed is automatically restored
+   - If you reconnect within 30 seconds, the speed stays at 1Gbps (timer resets)
+6. **Requirements:** Sunshine/Apollo must be installed in default installation folders for log monitoring to work
+
+**Why the 30-second window?** This prevents an infinite loop: when the network speed changes, it causes a temporary disconnect. The 30-second inactivity timer gives you time to reconnect without the app thinking the streaming session has ended.
+
+### Manual Streaming Mode
+1. Click "Start Streaming Mode" button anytime
+2. On-screen alert informs you of the network adjustment
+3. Network throttles to 1Gbps immediately
+4. Click "Stop Streaming Mode" to restore original speed
+
+## 📝 Installation
+1. Go to the **Releases** page of this repository.
+2. Download the latest `StreamTweak_2.5.0_Installer.exe`
+3. Run the installer and enjoy seamless streaming.
 
 ## 🙏 Support the Project
-If this tool helped you fix your Moonlight streaming stutters or made your network management easier, consider buying me a coffee! ☕
+If this tool helped you fix your Moonlight stutters or made managing your PC easier, consider buying me a coffee! ☕
 
 [![Donate with PayPal](https://img.shields.io/badge/Donate-PayPal-blue.svg)](https://paypal.me/foggypunk)
 
