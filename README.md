@@ -2,6 +2,7 @@
 ![Platform](https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-blue.svg)
 ![Framework](https://img.shields.io/badge/Framework-.NET%208.0-purple.svg)
 ![Downloads](https://img.shields.io/github/downloads/foggypunk/StreamTweak/total?label=Downloads&color=orange)
+![Visitors](https://img.shields.io/badge/dynamic/json?url=https://raw.githubusercontent.com/FoggyPunk/StreamTweak/master/visitors.json&query=value&label=Visitors&color=green)
 
 **StreamTweak** is born to solve technical bottlenecks between Host and Client, offering an intelligent control center to manage your remote gaming PC with a single click.
 
