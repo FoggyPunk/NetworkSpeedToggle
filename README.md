@@ -1,4 +1,4 @@
-# StreamTweak
+# 🎮 StreamTweak
 ![Platform](https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-blue.svg)
 ![Framework](https://img.shields.io/badge/Framework-.NET%208.0-purple.svg)
 ![Downloads](https://img.shields.io/github/downloads/foggypunk/StreamTweak/total?label=Downloads&color=orange)
@@ -110,9 +110,9 @@ SpatialAudioDeviceConfiguration.GetForDeviceId(Steam Streaming Speakers)
         └─ SetDefaultSpatialAudioFormatAsync(DolbyAtmos) ──► status: ✓ enabled
 ```
 
-## 🎮 How It Works
+## 🪄 How It Works
 
-### Auto Streaming Mode
+### 🤖 Auto Streaming Mode
 1. Enable "Auto Streaming Mode" in the Settings
 2. StreamTweak monitors your streaming server logs in real-time (Sunshine, Apollo, Vibeshine, Vibepollo)
 3. When Moonlight connects from a client:
@@ -125,13 +125,13 @@ SpatialAudioDeviceConfiguration.GetForDeviceId(Steam Streaming Speakers)
    - The inactivity timer prevents the app from reverting speed prematurely (avoiding reconnection loops)
 5. When streaming ends, original speed is automatically restored
 
-### Manual Streaming Mode
+### 🕹️ Manual Streaming Mode
 1. Click "Start Streaming Mode" button anytime
 2. On-screen alert informs you of the network adjustment
 3. Network throttles to 1Gbps immediately — no UAC prompt
 4. Click "Stop Streaming Mode" to restore original speed
 
-### Auto Dolby Atmos for Headphones
+### 🎧 Auto Dolby Atmos for Headphones
 1. Install [Dolby Access](https://apps.microsoft.com/detail/9n0866fs04w8) on the host PC and enable it at least once
 2. Enable "Auto Dolby Atmos for Headphones" in the Audio tab (or from the tray menu)
 3. The Audio tab will show a green indicator confirming Dolby Atmos for Headphones is detected
