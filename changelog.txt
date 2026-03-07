@@ -1,8 +1,8 @@
 ==========================================
-StreamTweak - ChangeLog - Developed by FoggyPunk
+StreamTweak - ChangeLog - Developed by FoggyBytes
 ==========================================
 
-https://github.com/FoggyPunk/StreamTweak
+https://github.com/FoggyBytes/StreamTweak
 
 Version 3.1.0 - The "Atmos Update" (06/03/2026)
 ------------------------------------------

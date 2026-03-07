@@ -8,7 +8,7 @@ namespace StreamTweak
 {
     public static class ToastHelper
     {
-        private const string AppId = "FoggyPunk.StreamTweak";
+        private const string AppId = "FoggyBytes.StreamTweak";
 
         [DllImport("shell32.dll", SetLastError = true)]
         private static extern int SetCurrentProcessExplicitAppUserModelID(

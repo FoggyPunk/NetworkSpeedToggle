@@ -306,7 +306,7 @@ namespace StreamTweak
             {
                 _httpClient.DefaultRequestHeaders.UserAgent.TryParseAdd("StreamTweak-UpdateCheck");
                 string json = await _httpClient.GetStringAsync(
-                    "https://api.github.com/repos/FoggyPunk/StreamTweak/releases/latest");
+                    "https://api.github.com/repos/FoggyBytes/StreamTweak/releases/latest");
 
                 using var doc = JsonDocument.Parse(json);
                 string? tagName = doc.RootElement.GetProperty("tag_name").GetString();
@@ -360,7 +360,7 @@ namespace StreamTweak
         {
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
             {
-                FileName = "https://github.com/FoggyPunk/StreamTweak/releases/latest",
+                FileName = "https://github.com/FoggyBytes/StreamTweak/releases/latest",
                 UseShellExecute = true
             });
         }
@@ -387,12 +387,12 @@ namespace StreamTweak
         {
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
             {
-                FileName = "https://github.com/FoggyPunk/StreamTweak",
+                FileName = "https://github.com/FoggyBytes/StreamTweak",
                 UseShellExecute = true
             });
         }
 
-        // ─── Config ─────────────────────────────────────────────────────────
+        // ─── Config
 
         private void LoadConfig()
         {

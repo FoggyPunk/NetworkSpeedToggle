@@ -573,7 +573,7 @@
                                Foreground="{DynamicResource TextForeground}"/>
 
                     <!-- Developer + Build (compact) -->
-                    <TextBlock Text="Developed by FoggyPunk" FontSize="12" FontWeight="SemiBold"
+                    <TextBlock Text="Developed by FoggyBytes" FontSize="12" FontWeight="SemiBold"
                                HorizontalAlignment="Center" Margin="0,0,0,2"
                                Foreground="{DynamicResource TextForeground}"/>
                     <TextBlock x:Name="AboutBuildDateText" FontSize="11" Opacity="0.55"

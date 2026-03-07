@@ -3,9 +3,9 @@
 ; =====================================================
 #define MyAppName "StreamTweak"
 #define MyAppVersion "3.1.0"
-#define MyAppPublisher "FoggyPunk"
+#define MyAppPublisher "FoggyBytes"
 #define MyAppExeName "StreamTweak.exe"
-#define MyAppURL "https://github.com/FoggyPunk/StreamTweak"
+#define MyAppURL "https://github.com/FoggyBytes/StreamTweak"
 #define ServiceName "StreamTweakService"
 #define ServiceExe "StreamTweakService.exe"
 
@@ -92,7 +92,7 @@ begin
   DevelopedByLabel.Parent := WizardForm.WelcomePage;
   DevelopedByLabel.Left := LogoImage.Left;
   DevelopedByLabel.Top := LogoImage.Top + LogoImage.Height + ScaleY(30);
-  DevelopedByLabel.Caption := 'Developed by FoggyPunk © 2026';
+  DevelopedByLabel.Caption := 'Developed by FoggyBytes © 2026';
   DevelopedByLabel.Font.Size := 10;
   DevelopedByLabel.AutoSize := True;
 
