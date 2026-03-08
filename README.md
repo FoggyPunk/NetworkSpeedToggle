@@ -9,7 +9,31 @@
 ## ✅ Compatibility
 StreamTweak works seamlessly with [Moonlight](https://github.com/moonlight-stream/moonlight-qt), [Sunshine](https://github.com/LizardByte/Sunshine), [Apollo](https://github.com/ClassicOldSong/Apollo), [Vibeshine](https://github.com/Nonary/vibeshine), and [Vibepollo](https://github.com/Nonary/Vibepollo).
 
-> ⚠️ **Browser Warning:** When downloading the installer, Edge or Chrome may show a security warning. This is a **false positive** caused by the lack of a paid code-signing certificate — common for open-source projects. Click **"Keep"** or **"Keep anyway"** to proceed. The source code is fully available here for inspection.
+> ⚠️ **Note on Installer Warnings:** When downloading the installer, Windows SmartScreen or your browser may show a security warning. This happens because the executable is not signed with a commercial code‑signing certificate — a common situation for open‑source projects. You can safely choose **Keep** / **Keep anyway**. The full source code is available in this repository for inspection.
+
+## 🔥 Key Features
+
+### 🛜 Network & Streaming Intelligence
+- **Auto Streaming Mode:** Intelligently monitors [Sunshine](https://github.com/LizardByte/Sunshine), [Apollo](https://github.com/ClassicOldSong/Apollo), [Vibeshine](https://github.com/Nonary/vibeshine) and [Vibepollo](https://github.com/Nonary/Vibepollo) logs for incoming Moonlight connections and auto-adjusts network speed. Works with any installation path.
+- **Manual Streaming Control:** One-click activation to instantly throttle to 1Gbps with professional UI feedback.
+- **Smart Notifications:** Non-intrusive on-screen alerts inform users before network changes occur.
+- **Smart Filtering:** Only shows real LAN adapters (no VPNs, Wi-Fi, or virtual adapters).
+- **Driver Bypass:** Automatically detects and bypasses Realtek/Intel driver localization limitations.
+- **Completely UAC-free:** A background Windows Service handles all privileged operations silently — no prompts during normal use.
+- **Auto-Start:** Launches at Windows logon via a hidden Scheduled Task.
+
+### 🎧 Audio Enhancements
+- **Auto Dolby Atmos for Headphones:** Automatically enables Dolby Atmos for Headphones on Steam Streaming Speakers 30 seconds after a streaming session starts — requires Dolby Access on the host PC.
+- **Dolby Access detection:** The Audio tab shows a live indicator (via Windows Spatial Audio API) confirming whether the Dolby Atmos format is available on the system.
+
+### 🖥️ UI & Control Experience
+- **Settings Dashboard:** Sleek UI to manage physical adapters and speeds.
+- **Tray Control:** Right-click the tray icon to toggle Auto Mode, check current link speed, and monitor streaming session status — all without opening Settings.
+- **Streaming App Detection:** StreamTweak locates the log folder of the active streaming server and lets you open it in Explorer with one click.
+
+### 📚 System Info & Diagnostics
+- **Logs Tab:** Session history for the last 10 speed changes — trigger mode, duration, and original speed recorded automatically.
+- **About Tab:** Version info, GitHub link, license badge, and donation button in a dedicated panel.
 
 ## ✨ What's New in Version 3.1.1 — The "Session Integrity Update"
 
@@ -50,22 +74,6 @@ Due to how UDP packet buffering works on network switches, this mismatch often l
 StreamTweak makes the workaround (throttling the Host PC's Ethernet adapter down to 1.0 Gbps) instantaneous and completely seamless — no interruptions, no prompts.
 
 *Fun fact: This entire application, including the C# code, UI logic, and Inno Setup installer, was developed with the assistance of AI.*
-
-## 🔥 Key Features
-- **Settings Dashboard:** Sleek UI to manage physical adapters and speeds.
-- **Auto Dolby Atmos for Headphones:** automatically enables Dolby Atmos for Headphones on Steam Streaming Speakers 30 seconds after a streaming session starts — requires [Dolby Access](https://apps.microsoft.com/detail/9n0866fs04w8) on the host PC.
-- **Dolby Access detection:** the Audio tab shows a live indicator (via Windows Spatial Audio API) confirming whether the Dolby Atmos format is available on the system.
-- **Logs Tab:** Session history for the last 10 speed changes — trigger mode, duration, and original speed recorded automatically.
-- **Streaming App Detection:** StreamTweak locates the log folder of the active streaming server and lets you open it in Explorer with one click.
-- **About Tab:** Version info, GitHub link, license badge, and donation button in a dedicated panel.
-- **Smart Filtering:** Only shows real LAN adapters (no VPNs, Wi-Fi, or virtual adapters).
-- **Driver Bypass:** Automatically detects and bypasses Realtek/Intel driver localization limitations.
-- **Auto Streaming Mode:** Intelligently monitors Sunshine, Apollo, Vibeshine and Vibepollo logs for incoming Moonlight connections and auto-adjusts network speed. Works with any installation path.
-- **Manual Streaming Control:** One-click activation to instantly throttle to 1Gbps with professional UI feedback.
-- **Smart Notifications:** Non-intrusive on-screen alerts inform users before network changes occur.
-- **Tray Control:** Right-click the tray icon to toggle Auto Mode, check current link speed, and monitor streaming session status — all without opening Settings.
-- **Completely UAC-free:** A background Windows Service handles all privileged operations silently — no prompts during normal use.
-- **Auto-Start:** Launches at Windows logon via a hidden Scheduled Task.
 
 ## 🏗️ Architecture
 
@@ -152,7 +160,7 @@ SpatialAudioDeviceConfiguration.GetForDeviceId(Steam Streaming Speakers)
 
 ## 📝 Installation
 1. Go to the **Releases** page of this repository.
-2. Download the latest `StreamTweak_3.1.0_Installer.exe`
+2. Download the latest `StreamTweak_3.1.1_Installer.exe`
 3. Run the installer and enjoy seamless streaming.
 
 ## 🙏 Support the Project
