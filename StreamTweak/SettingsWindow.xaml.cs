@@ -277,6 +277,12 @@ namespace StreamTweak
                 System.Diagnostics.Process.Start("explorer.exe", path);
         }
 
+        private void ClearLogsButton_Click(object sender, RoutedEventArgs e)
+        {
+            SessionLogger.ClearAll();
+            RefreshSessionHistory();
+        }
+
         private void PopulateAboutInfo()
         {
             var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;

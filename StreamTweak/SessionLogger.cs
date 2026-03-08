@@ -15,16 +15,20 @@ namespace StreamTweak
         public string TriggerMode { get; set; } = "Auto"; // "Auto" | "Manual"
         public string OriginalSpeed { get; set; } = string.Empty;
 
+        public string? EndReason { get; set; }
+
         [JsonIgnore]
         public string DurationDisplay
         {
             get
             {
-                if (EndTime == null) return "Active";
+                if (EndTime == null)
+                    return EndReason == "Interrupted" ? "—" : "Active";
                 var d = EndTime.Value - StartTime;
-                return d.TotalMinutes >= 1
+                string duration = d.TotalMinutes >= 1
                     ? $"{(int)d.TotalMinutes}m {d.Seconds}s"
                     : $"{d.Seconds}s";
+                return EndReason == "Disconnected" ? $"{duration} ⚡" : duration;
             }
         }
 
@@ -64,7 +68,35 @@ namespace StreamTweak
             catch { }
         }
 
-        public static void EndSession()
+        public static void ClearAll()
+        {
+            try
+            {
+                var sessions = Load();
+                // Preserve the currently active session so EndSession() can still close it properly
+                var toKeep = sessions.Where(s => s.Id == _activeSessionId).ToList();
+                Save(toKeep);
+            }
+            catch { }
+        }
+
+        public static void Initialize()
+        {
+            try
+            {
+                var sessions = Load();
+                bool changed = false;
+                foreach (var s in sessions.Where(s => s.EndTime == null && s.EndReason == null))
+                {
+                    s.EndReason = "Interrupted";
+                    changed = true;
+                }
+                if (changed) Save(sessions);
+            }
+            catch { }
+        }
+
+        public static void EndSession(string endReason = "User")
         {
             if (_activeSessionId == null) return;
             try
@@ -74,6 +106,7 @@ namespace StreamTweak
                 if (entry != null)
                 {
                     entry.EndTime = DateTime.Now;
+                    entry.EndReason = endReason;
                     Save(sessions);
                 }
                 _activeSessionId = null;

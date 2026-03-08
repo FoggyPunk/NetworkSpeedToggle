@@ -47,6 +47,7 @@ namespace StreamTweak
             Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
             LoadConfig();
+            SessionLogger.Initialize();
 
             tb = (TaskbarIcon)FindResource("MyNotifyIcon")!;
             UpdateIconBasedOnSpeed(false);
@@ -299,7 +300,7 @@ namespace StreamTweak
                 if (!string.IsNullOrEmpty(originalSpeedForStreaming))
                     ApplySpeed(originalSpeedForStreaming);
 
-                SessionLogger.EndSession();
+                SessionLogger.EndSession("User");
                 isStreamingModeActive = false;
                 SaveStreamingStateToConfig(false, string.Empty);
                 await PollForIconUpdate(true);
@@ -524,19 +525,14 @@ namespace StreamTweak
                         _dolbyMonitor.OnStreamingStarted();
                         if (!isAutoStreamingActive)
                             HandleAutoStreamStart();
+                        else
+                            StopInactivityTimer(); // reconnected within grace period
                     }
                     else if (e.Event == LogParser.StreamingEvent.StreamStopped)
                     {
-                        if (inactivityTimer == null || !inactivityTimer.IsEnabled)
-                        {
-                            _dolbyMonitor.OnStreamingStopped();
-                            if (isAutoStreamingActive)
-                                HandleAutoStreamStop();
-                        }
-                        else
-                        {
-                            DebugLog("StreamStopped ignored: inactivity timer active (likely temporary disconnect)");
-                        }
+                        _dolbyMonitor.OnStreamingStopped();
+                        if (isAutoStreamingActive)
+                            StartInactivityTimer(); // start grace period — wait for possible reconnect
                     }
                 });
             }
@@ -584,7 +580,6 @@ namespace StreamTweak
                 SaveStreamingStateToConfig(true, originalSpeedForAutoStreaming ?? string.Empty);
                 SessionLogger.StartSession("Auto", originalSpeedForAutoStreaming ?? string.Empty);
 
-                StartInactivityTimer();
                 UpdateTrayMenu();
                 await PollForIconUpdate(false);
 
@@ -597,7 +592,7 @@ namespace StreamTweak
             catch { }
         }
 
-        private async void HandleAutoStreamStop()
+        private async void HandleAutoStreamStop(string endReason = "User")
         {
             try
             {
@@ -606,7 +601,7 @@ namespace StreamTweak
                 if (!string.IsNullOrEmpty(originalSpeedForAutoStreaming))
                     ApplySpeed(originalSpeedForAutoStreaming);
 
-                SessionLogger.EndSession();
+                SessionLogger.EndSession(endReason);
                 isAutoStreamingActive = false;
                 isStreamingModeActive = false;
                 originalSpeedForAutoStreaming = null;
@@ -616,7 +611,10 @@ namespace StreamTweak
                 await PollForIconUpdate(false);
                 SaveStreamingStateToConfig(false, string.Empty);
 
-                ToastHelper.Show("Streaming Ended", "Network speed restored to original.");
+                string toastBody = endReason == "Disconnected"
+                    ? "Connection lost. Network speed restored."
+                    : "Network speed restored to original.";
+                ToastHelper.Show("Streaming Ended", toastBody);
 
                 settingsWindow?.SyncStreamingState(false, string.Empty);
                 settingsWindow?.RefreshSessionHistory();
@@ -635,9 +633,12 @@ namespace StreamTweak
                 inactivityTimer.Tick += (s, e) =>
                 {
                     StopInactivityTimer();
-                    DebugLog("Inactivity timer expired — no reconnection detected");
+                    DebugLog("Inactivity timer expired — no reconnect detected, ending session as disconnected");
+                    if (isAutoStreamingActive)
+                        HandleAutoStreamStop("Disconnected");
                 };
             }
+            inactivityTimer.Stop(); // reset countdown if already running
             inactivityTimer.Start();
             DebugLog($"Inactivity timer started ({INACTIVITY_TIMEOUT_MS}ms)");
         }

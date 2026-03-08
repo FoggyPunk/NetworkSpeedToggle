@@ -4,6 +4,35 @@ StreamTweak - ChangeLog - Developed by FoggyBytes
 
 https://github.com/FoggyBytes/StreamTweak
 
+Version 3.1.1 - The "Session Integrity Update" (08/03/2026)
+------------------------------------------
+✨ NEW FEATURES:
+• Logs tab — Clear Session History button: a dedicated button in the Logs
+  tab now allows clearing the session history with a single click; any
+  currently active session is preserved and still tracked correctly
+
+🔧 IMPROVEMENTS:
+• Session end reason tracking: each session now records how it ended —
+  User (clean stop from menu), Disconnected (connection lost with no
+  reconnect within 30 seconds), or Interrupted (app closed or restarted
+  mid-session)
+• Duration display: sessions that ended due to a lost connection are
+  marked with ⚡ in the Duration column; sessions interrupted by an app
+  restart or crash are shown as — instead of "Active"
+• Orphan session recovery: at startup, any session left open by a previous
+  crash or forced restart is automatically sealed as Interrupted
+
+🐛 STABILITY & FIXES:
+• Fixed sessions remaining stuck as "Active" indefinitely when StreamTweak
+  was restarted while a streaming session was still in progress
+• Fixed the inactivity timer expiring without actually ending the session
+  when no client reconnect occurred within the 30-second grace period
+• Fixed StreamStopped events being silently discarded during the first 30
+  seconds of a session, even when the client had truly disconnected
+• Reconnect detection: a StreamStarted event received while a session is
+  active now correctly cancels the pending disconnect timeout, keeping
+  the session alive without logging a duplicate entry
+
 Version 3.1.0 - The "Atmos Update" (06/03/2026)
 ------------------------------------------
 ✨ NEW FEATURES:

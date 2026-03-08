@@ -503,11 +503,19 @@
                                Foreground="{DynamicResource TextForeground}" Opacity="0.7" HorizontalAlignment="Center"
                                VerticalAlignment="Center" Visibility="Collapsed"/>
 
-                    <!-- Stream host label -->
-                    <TextBlock Grid.Row="2" Text="Stream host log folder"
-                               FontSize="9" FontWeight="SemiBold" Opacity="0.45"
-                               HorizontalAlignment="Center" Margin="0,10,0,4"
-                               Foreground="{DynamicResource TextForeground}"/>
+                    <!-- Clear button + Stream host label -->
+                    <StackPanel Grid.Row="2" Margin="0,10,0,4" HorizontalAlignment="Center">
+                        <Button x:Name="ClearLogsButton"
+                                HorizontalAlignment="Center"
+                                Style="{StaticResource ModernButton}"
+                                FontSize="11" Height="22" Width="195"
+                                ToolTip="Clear session history"
+                                Click="ClearLogsButton_Click">Clear Session History</Button>
+                        <TextBlock Text="Stream host log folder"
+                                   FontSize="9" FontWeight="SemiBold" Opacity="0.45"
+                                   HorizontalAlignment="Center" Margin="0,8,0,0"
+                                   Foreground="{DynamicResource TextForeground}"/>
+                    </StackPanel>
 
                     <!-- Detected streaming software -->
                     <Border Grid.Row="3" Padding="8,7"

@@ -11,13 +11,23 @@ StreamTweak works seamlessly with [Moonlight](https://github.com/moonlight-strea
 
 > ⚠️ **Browser Warning:** When downloading the installer, Edge or Chrome may show a security warning. This is a **false positive** caused by the lack of a paid code-signing certificate — common for open-source projects. Click **"Keep"** or **"Keep anyway"** to proceed. The source code is fully available here for inspection.
 
-## ✨ What's New in Version 3.1.0 — The "Atmos Update"
+## ✨ What's New in Version 3.1.1 — The "Session Integrity Update"
+
+- **Session reliability:** fixed sessions remaining stuck as "Active" indefinitely after a restart or crash — orphaned entries are automatically sealed at startup
+- **End reason tracking:** each session now records how it ended — *User* (clean stop), *Disconnected* (connection lost, no reconnect within 30 s), or *Interrupted* (app closed mid-session)
+- **Duration indicators:** ⚡ marks sessions that ended due to a lost connection; — replaces "Active" for sessions interrupted by a restart
+- **Clear Session History:** new button in the Logs tab to wipe the session list in one click; any active session is preserved
+
+<details>
+<summary>Previous highlights — Version 3.1.0 — The "Atmos Update"</summary>
 
 - **Auto Dolby Atmos for Headphones:** StreamTweak now automatically enables Dolby Atmos for Headphones on Steam Streaming Speakers once a streaming session has been active for 30 continuous seconds — requires [Dolby Access](https://apps.microsoft.com/detail/9n0866fs04w8) installed on the host PC
 - **Dolby Access detection:** the Audio tab displays a live status indicator that confirms whether Dolby Atmos for Headphones is available on the system, checked via the Windows Spatial Audio API at startup and each time the Audio tab is opened
 - **Audio activation status:** the Status box in the Audio tab turns green when Dolby Atmos for Headphones is successfully enabled on Steam Streaming Speakers
 - **Tray Dolby Atmos toggle:** enable or disable Dolby auto-activation directly from the system tray right-click menu, in sync with the Audio tab toggle
 - **Version check:** StreamTweak now compares its current version against the latest GitHub release and shows a direct download link in the About tab when an update is available
+
+</details>
 
 <details>
 <summary>Previous highlights — Version 3.0.0 — The "Awareness Update"</summary>
@@ -85,9 +95,10 @@ Every speed-change event — whether triggered automatically or manually — is 
 SessionEntry {
   Id             →  short unique identifier
   StartTime      →  when the session began
-  EndTime        →  when the original speed was restored (null if active)
+  EndTime        →  when the original speed was restored (null if active or interrupted)
   TriggerMode    →  "Auto" | "Manual"
   OriginalSpeed  →  the speed key that will be restored on session end
+  EndReason      →  "User" | "Disconnected" | "Interrupted" (null if still active)
 }
 ```
 
