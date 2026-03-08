@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<!-- windows10.0.19041.0 required for SpatialAudioFormatSubtype.DolbyAtmosForHeadphones and IsSpatialAudioFormatSupported APIs -->
+		<TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<UseWPF>true</UseWPF>
+		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+		<ApplicationIcon>Resources\streamtweak.ico</ApplicationIcon>
+		<Version>3.1.1</Version>
+		<AssemblyVersion>3.1.1.0</AssemblyVersion>
+		<FileVersion>3.1.1.0</FileVersion>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Remove="Resources\streammodeko.ico" />
+		<None Remove="Resources\streamtweak.ico" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="Resources\streammodeko.ico">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Resources\streamtweak.ico">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Resources\streammodeok.ico">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="2.0.1" />
+		<PackageReference Include="Microsoft.Management.Infrastructure" Version="3.0.0" />
+	</ItemGroup>
+
+</Project>
