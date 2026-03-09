@@ -6,8 +6,8 @@
         ResizeMode="NoResize"
         WindowStyle="None"
         Topmost="True"
-        Background="#FFF3F3F3"
-        Foreground="#FF202020"
+        Background="#FF202020"
+        Foreground="#FFFFFFFF"
         FontFamily="Segoe UI"
         Icon="pack://application:,,,/Resources/streamtweak.ico">
 
@@ -23,7 +23,7 @@
                        FontSize="13" TextAlignment="Center" TextWrapping="Wrap" Margin="0,0,0,12" LineHeight="20"/>
 
             <TextBlock Text="Your stream will briefly disconnect. Reconnect within 30 seconds or speed will revert to original." 
-                       FontSize="12" TextAlignment="Center" TextWrapping="Wrap" Foreground="#FF606060" Margin="0,0,0,0" LineHeight="18"/>
+                       FontSize="12" TextAlignment="Center" TextWrapping="Wrap" Foreground="#FFABABAB" Margin="0,0,0,0" LineHeight="18"/>
         </StackPanel>
     </Grid>
 </Window>

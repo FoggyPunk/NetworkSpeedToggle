@@ -4,127 +4,85 @@ StreamTweak - ChangeLog - Developed by FoggyBytes
 
 https://github.com/FoggyBytes/StreamTweak
 
-Version 3.2.0 - The "Display Update" (08/03/2026)
+Version 4.0.0 - The "Foundation Update" (10/03/2026)
+------------------------------------------
+New starting point — with this release the visual identity of StreamTweak is consolidated and the interface is ready to grow.
+
+✨ NEW FEATURES:
+• Button animations: all interactive buttons now feature smooth scale animations on hover (+3–4%) and a tactile press-down effect on click, bringing the interface closer to a native Windows 11 feel; primary action buttons (Start/Stop Streaming Mode, Apply Settings, View on GitHub, Donate via PayPal) animate on hover without altering their background color, preserving visual focus on key actions
+
+🔧 IMPROVEMENTS:
+• Unified dark theme: the StreamingAdjustmentAlert notification window now fully matches the main Settings window dark palette, ensuring visual consistency across all application surfaces
+• Visual identity: the accent #BE5438 — a warm rust tone — is established as the defining color of the StreamTweak interface, consistently applied across all interactive states, panel highlights, and active controls
+
+Version 3.2.0 - The "Display Update" (09/03/2026)
 ------------------------------------------
 ✨ NEW FEATURES:
-• Display tab — HDR monitor control: the new Display tab shows all active
-  monitors with resolution, refresh rate, and current HDR state; HDR can
-  be toggled on or off directly from StreamTweak without opening Windows
-  Settings, with full compatibility across Windows 10 and Windows 11
-  (including 24H2 and later)
-• Display tab — Auto HDR toggle: enables or disables Windows Auto HDR for
-  supported SDR games directly from the app; the change is applied
-  immediately via registry and broadcast to all running applications
-• Display tab — virtual display awareness: when Apollo or Vibepollo is
-  detected, the Display tab automatically highlights the virtual display
-  (SudoVDA / IDD) used for remote streaming, keeping the view focused on
-  what matters during a session
-• Tray right-click — HDR toggles: HDR and Auto HDR can also be toggled
-  directly from the system tray context menu, in sync with the Display tab
+• Display tab — HDR monitor control: the new Display tab shows all active monitors with resolution, refresh rate, and current HDR state; HDR can be toggled on or off directly from StreamTweak without opening Windows Settings, with full compatibility across Windows 10 and Windows 11 (including 24H2 and later)
+• Display tab — Auto HDR toggle: enables or disables Windows Auto HDR for supported SDR games directly from the app; the change is applied immediately via registry and broadcast to all running applications
+• Display tab — virtual display awareness: when Apollo or Vibepollo is detected, the Display tab automatically highlights the virtual display (SudoVDA / IDD) used for remote streaming, keeping the view focused on what matters during a session
+• Tray right-click — HDR toggles: HDR and Auto HDR can also be toggled directly from the system tray context menu, in sync with the Display tab
 
 Version 3.1.1 - The "Session Integrity Update" (08/03/2026)
 ------------------------------------------
 ✨ NEW FEATURES:
-• Logs tab — Clear Session History button: a dedicated button in the Logs
-  tab now allows clearing the session history with a single click; any
-  currently active session is preserved and still tracked correctly
+• Logs tab — Clear Session History button: a dedicated button in the Logs tab now allows clearing the session history with a single click; any currently active session is preserved and still tracked correctly
 
 🔧 IMPROVEMENTS:
-• Session end reason tracking: each session now records how it ended —
-  User (clean stop from menu), Disconnected (connection lost with no
-  reconnect within 30 seconds), or Interrupted (app closed or restarted
-  mid-session)
-• Duration display: sessions that ended due to a lost connection are
-  marked with ⚡ in the Duration column; sessions interrupted by an app
-  restart or crash are shown as — instead of "Active"
-• Orphan session recovery: at startup, any session left open by a previous
-  crash or forced restart is automatically sealed as Interrupted
+• Session end reason tracking: each session now records how it ended — User (clean stop from menu), Disconnected (connection lost with no reconnect within 30 seconds), or Interrupted (app closed or restarted mid-session)
+• Duration display: sessions that ended due to a lost connection are marked with ⚡ in the Duration column; sessions interrupted by an app restart or crash are shown as — instead of "Active"
+• Orphan session recovery: at startup, any session left open by a previous crash or forced restart is automatically sealed as Interrupted
 
 🐛 STABILITY & FIXES:
-• Fixed sessions remaining stuck as "Active" indefinitely when StreamTweak
-  was restarted while a streaming session was still in progress
-• Fixed the inactivity timer expiring without actually ending the session
-  when no client reconnect occurred within the 30-second grace period
-• Fixed StreamStopped events being silently discarded during the first 30
-  seconds of a session, even when the client had truly disconnected
-• Reconnect detection: a StreamStarted event received while a session is
-  active now correctly cancels the pending disconnect timeout, keeping
-  the session alive without logging a duplicate entry
+• Fixed sessions remaining stuck as "Active" indefinitely when StreamTweak was restarted while a streaming session was still in progress
+• Fixed the inactivity timer expiring without actually ending the session when no client reconnect occurred within the 30-second grace period
+• Fixed StreamStopped events being silently discarded during the first 30 seconds of a session, even when the client had truly disconnected
+• Reconnect detection: a StreamStarted event received while a session is active now correctly cancels the pending disconnect timeout, keeping the session alive without logging a duplicate entry
 
 Version 3.1.0 - The "Atmos Update" (06/03/2026)
 ------------------------------------------
 ✨ NEW FEATURES:
-• Audio tab — Auto Dolby Atmos for Headphones: when a streaming session
-  is detected and stays active for at least 30 seconds, StreamTweak
-  automatically enables Dolby Atmos for Headphones on Steam Streaming
-  Speakers, provided Dolby Access is installed and the format is available
-• Audio tab — Dolby Access detection indicator: a live status indicator
-  shows whether Dolby Atmos for Headphones is detected on the host PC,
-  checked via the Windows Spatial Audio API at startup and each time the
-  Audio tab is opened
-• Audio tab — activation status: the Status box turns green when Dolby
-  Atmos for Headphones is successfully enabled
-• Tray right-click — Dolby Atmos toggle: enable or disable the Dolby
-  Atmos auto-activation directly from the system tray context menu,
-  in sync with the Audio tab toggle
+• Audio tab — Auto Dolby Atmos for Headphones: when a streaming session is detected and stays active for at least 30 seconds, StreamTweak automatically enables Dolby Atmos for Headphones on Steam Streaming Speakers, provided Dolby Access is installed and the format is available
+• Audio tab — Dolby Access detection indicator: a live status indicator shows whether Dolby Atmos for Headphones is detected on the host PC, checked via the Windows Spatial Audio API at startup and each time the Audio tab is opened
+• Audio tab — activation status: the Status box turns green when Dolby Atmos for Headphones is successfully enabled
+• Tray right-click — Dolby Atmos toggle: enable or disable the Dolby Atmos auto-activation directly from the system tray context menu, in sync with the Audio tab toggle
 
 🔧 IMPROVEMENTS:
-• About tab — version check: the current version of StreamTweak is now
-  compared against the latest GitHub release; if a newer version is
-  available, a download link is shown automatically
+• About tab — version check: the current version of StreamTweak is now compared against the latest GitHub release; if a newer version is available, a download link is shown automatically
 
 Version 3.0.0 - The "Awareness Update" (06/03/2026)
 ------------------------------------------
 ✨ NEW FEATURES:
-• Logs tab: browse the last 10 speed-change sessions at a glance,
-  including trigger mode (Auto/Manual), duration, and original speed
-• Streaming app detection in Logs tab: StreamTweak shows whether it has
-  correctly located the log folder of the streaming server installed on
-  the host PC (Sunshine, Apollo, Vibeshine or Vibepollo); click the path
-  to open the folder in Explorer
-• About tab: version info, GitHub repository link, GPL v3 license badge,
-  and PayPal donation button all in one place
-• Tray right-click — Auto Mode toggle: enable or disable Auto Streaming
-  Mode directly from the system tray without opening Settings
-• Tray speed readout: current link speed of the selected adapter is
-  always visible in the tray context menu
-• Tray streaming status: the context menu now shows whether a streaming
-  session is currently active or inactive
+• Logs tab: browse the last 10 speed-change sessions at a glance, including trigger mode (Auto/Manual), duration, and original speed
+• Streaming app detection in Logs tab: StreamTweak shows whether it has correctly located the log folder of the streaming server installed on the host PC (Sunshine, Apollo, Vibeshine or Vibepollo); click the path to open the folder in Explorer
+• About tab: version info, GitHub repository link, GPL v3 license badge, and PayPal donation button all in one place
+• Tray right-click — Auto Mode toggle: enable or disable Auto Streaming Mode directly from the system tray without opening Settings
+• Tray speed readout: current link speed of the selected adapter is always visible in the tray context menu
+• Tray streaming status: the context menu now shows whether a streaming session is currently active or inactive
 
 🔧 IMPROVEMENTS:
-• Full UI revision: centered layout across all panels, redesigned tab
-  bar with Dark/Light Mode button integrated, improved spacing and
-  visual balance throughout the Settings window
+• Full UI revision: centered layout across all panels, redesigned tab bar with Dark/Light Mode button integrated, improved spacing and visual balance throughout the Settings window
 
 Version 2.5.2 - The "Vibe Update" (06/03/2026)
 ------------------------------------------
 ✨ NEW FEATURES:
-• Vibepollo and Vibeshine support: Auto Streaming Mode now works with
-  all major Sunshine forks
-• Dynamic log discovery: streaming server location is auto-detected via
-  registry lookup, with Program Files scan as fallback — custom
-  installation paths fully supported
-• Log rotation support: automatically follows dynamic log files
-  (sunshine-YYYYMMDD-HHMMSS-mmm.log) used by Vibepollo and Vibeshine
+• Vibepollo and Vibeshine support: Auto Streaming Mode now works with all major Sunshine forks
+• Dynamic log discovery: streaming server location is auto-detected via registry lookup, with Program Files scan as fallback — custom installation paths fully supported
+• Log rotation support: automatically follows dynamic log files (sunshine-YYYYMMDD-HHMMSS-mmm.log) used by Vibepollo and Vibeshine
 
 🔧 IMPROVEMENTS:
-• StreamingLogMonitor re-runs full log discovery every 10 seconds,
-  catching dynamic log files that appear after startup
-• Updated UI warning: disconnect during speed adjustment is now stated
-  clearly, with 30-second reconnect window explained
+• StreamingLogMonitor re-runs full log discovery every 10 seconds, catching dynamic log files that appear after startup
+• Updated UI warning: disconnect during speed adjustment is now stated clearly, with 30-second reconnect window explained
 
 🐛 STABILITY & FIXES:
-• Fixed monitor not switching to dynamic log files when they appear
-  after StreamTweak has already started
+• Fixed monitor not switching to dynamic log files when they appear after StreamTweak has already started
 • Fixed FileStream disposed too early in StreamingLogMonitor
 
 Version 2.5.1 - The "Silent Power Update" (04/03/2026)
 ------------------------------------------
 ✨ NEW FEATURES:
-• StreamTweakService: Windows Service (LocalSystem) handling all network speed
-  changes with elevated privileges -- no UAC prompts, ever
-• Named Pipe IPC: secure communication between app and service, keeping the
-  privilege boundary clean and UX uninterrupted
+• StreamTweakService: Windows Service (LocalSystem) handling all network speed changes with elevated privileges -- no UAC prompts, ever
+• Named Pipe IPC: secure communication between app and service, keeping the privilege boundary clean and UX uninterrupted
 
 🔧 IMPROVEMENTS:
 • No UAC prompts in Manual Mode, Auto Mode, and tray menu
@@ -137,14 +95,10 @@ Version 2.5.1 - The "Silent Power Update" (04/03/2026)
 Version 2.5.0 - The "Smart Streaming Update" (04/03/2026)
 ------------------------------------------
 ✨ NEW FEATURES:
-• Auto Streaming Mode: Monitor Sunshine/Apollo logs and automatically
-  adjust network speed to 1Gbps when Moonlight connects
-• Smart Toggle Control: Enable/disable Auto Streaming Mode with an
-  elegant toggle switch
-• Streaming Adjustment Alert: Professional on-screen notification with 
-  4-second delay before network changes occur
-• Intelligent State Sync: Auto Streaming Mode and manual controls work
-  seamlessly together
+• Auto Streaming Mode: Monitor Sunshine/Apollo logs and automatically adjust network speed to 1Gbps when Moonlight connects
+• Smart Toggle Control: Enable/disable Auto Streaming Mode with an elegant toggle switch
+• Streaming Adjustment Alert: Professional on-screen notification with 4-second delay before network changes occur
+• Intelligent State Sync: Auto Streaming Mode and manual controls work seamlessly together
 
 🔧 IMPROVEMENTS:
 • Completely redesigned Settings UI with modern layout
@@ -160,8 +114,7 @@ Version 2.5.0 - The "Smart Streaming Update" (04/03/2026)
 Version 2.0 - The "ReBrand Update" (02/03/2026)
 ------------------------------------------
 ✨ NEW FEATURES:
-• Streaming Mode: Automatically throttles network to 1.0 Gbps on activation 
-  and restores previous speed when disabled
+• Streaming Mode: Automatically throttles network to 1.0 Gbps on activation and restores previous speed when disabled
 • Displays current monitor resolution and refresh rate of the Host PC
 • Shows installed GPU model for quick hardware reference
 
@@ -187,7 +140,7 @@ Version 1.2 - The "UI Update" (01/03/2026)
 ✨ NEW FEATURES:
 • Real-time current speed indicator
 • Modern Windows 11 UI with rounded corners
-• Complete Dark/Light theme (title bar + dropdowns) 
+• Complete Dark/Light theme (title bar + dropdowns)
 • Automatic Windows theme color detection
 
 🔧 IMPROVEMENTS:
@@ -214,6 +167,6 @@ Version 1.0 - Initial Release (28/02/2026)
 ------------------------------------------
 ✨ CORE FEATURES:
 • Switch between 1.0 Gbps ↔ 2.5 Gbps
-• System Tray icons (1G/2.5G indicators)  
+• System Tray icons (1G/2.5G indicators)
 • UAC-free startup via hidden Scheduled Task
 • Fixes Moonlight/Sunshine streaming stutter

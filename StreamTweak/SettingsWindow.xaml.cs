@@ -24,10 +24,10 @@ namespace StreamTweak
 
         private readonly string configFilePath;
         private Dictionary<string, string>? currentAdapterSpeeds;
-        private bool isDarkMode = false;
         private bool isStreamingMode = false;
         private string originalSpeed = string.Empty;
         private bool isAutoStreamingEnabled = true;
+        private bool _updateAvailable = false;
         private string currentAdapterName = string.Empty;
 
         public event EventHandler? SpeedApplied;
@@ -114,36 +114,18 @@ namespace StreamTweak
 
         private void ApplySystemAccentColor()
         {
-            try
-            {
-                var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\DWM");
-                if (key?.GetValue("AccentColor") is int abgr)
-                {
-                    byte r = (byte)(abgr & 0xFF);
-                    byte g = (byte)((abgr >> 8) & 0xFF);
-                    byte b = (byte)((abgr >> 16) & 0xFF);
+            var brand = Color.FromRgb(190, 84, 56);   // #BE5438
+            var hover = Color.FromRgb(160, 54, 26);   // #A0361A
 
-                    var brush = new SolidColorBrush(Color.FromArgb(255, r, g, b));
-                    brush.Freeze();
-                    var hoverBrush = new SolidColorBrush(Color.FromArgb(255,
-                        (byte)Math.Max(0, r - 20),
-                        (byte)Math.Max(0, g - 20),
-                        (byte)Math.Max(0, b - 20)));
-                    hoverBrush.Freeze();
+            var brush = new SolidColorBrush(brand);
+            brush.Freeze();
+            var hoverBrush = new SolidColorBrush(hover);
+            hoverBrush.Freeze();
 
-                    this.Resources["AccentColor"] = brush;
-                    this.Resources["AccentHoverColor"] = hoverBrush;
-                    Application.Current.Resources["AccentColor"] = brush;
-                    Application.Current.Resources["AccentHoverColor"] = hoverBrush;
-                }
-            }
-            catch { }
-        }
-
-        private void ThemeToggleButton_Click(object sender, RoutedEventArgs e)
-        {
-            ToggleTheme(!isDarkMode);
-            SaveConfig(saveAdapter: false);
+            this.Resources["AccentColor"]      = brush;
+            this.Resources["AccentHoverColor"] = hoverBrush;
+            Application.Current.Resources["AccentColor"]      = brush;
+            Application.Current.Resources["AccentHoverColor"] = hoverBrush;
         }
 
         private void NetworkTabButton_Click(object sender, RoutedEventArgs e)
@@ -206,31 +188,17 @@ namespace StreamTweak
             _ = CheckForUpdatesAsync();
         }
 
-        private void ToggleTheme(bool setDark)
+        private void ApplyDarkTheme()
         {
-            isDarkMode = setDark;
-            if (isDarkMode)
-            {
-                this.Resources["WindowBackground"] = new SolidColorBrush(Color.FromRgb(32, 32, 32));
-                this.Resources["PanelBackground"]  = new SolidColorBrush(Color.FromRgb(45, 45, 45));
-                this.Resources["TextForeground"]   = new SolidColorBrush(Colors.White);
-                this.Resources["BorderColor"]      = new SolidColorBrush(Color.FromRgb(60, 60, 60));
-                Application.Current.Resources["PanelBackground"]  = new SolidColorBrush(Color.FromRgb(45, 45, 45));
-                Application.Current.Resources["TextForeground"]   = new SolidColorBrush(Colors.White);
-                Application.Current.Resources["BorderColor"]      = new SolidColorBrush(Color.FromRgb(60, 60, 60));
-                ThemeToggleButton.Content = "☀️";
-            }
-            else
-            {
-                this.Resources["WindowBackground"] = new SolidColorBrush(Color.FromRgb(243, 243, 243));
-                this.Resources["PanelBackground"]  = new SolidColorBrush(Colors.White);
-                this.Resources["TextForeground"]   = new SolidColorBrush(Color.FromRgb(32, 32, 32));
-                this.Resources["BorderColor"]      = new SolidColorBrush(Color.FromRgb(209, 209, 209));
-                Application.Current.Resources["PanelBackground"]  = new SolidColorBrush(Colors.White);
-                Application.Current.Resources["TextForeground"]   = new SolidColorBrush(Color.FromRgb(32, 32, 32));
-                Application.Current.Resources["BorderColor"]      = new SolidColorBrush(Color.FromRgb(209, 209, 209));
-                ThemeToggleButton.Content = "🌙";
-            }
+            this.Resources["WindowBackground"]        = new SolidColorBrush(Color.FromRgb(32, 32, 32));
+            this.Resources["PanelBackground"]         = new SolidColorBrush(Color.FromRgb(45, 45, 45));
+            this.Resources["TextForeground"]          = new SolidColorBrush(Colors.White);
+            this.Resources["BorderColor"]             = new SolidColorBrush(Color.FromRgb(60, 60, 60));
+            this.Resources["SecondaryTextForeground"] = new SolidColorBrush(Color.FromRgb(171, 171, 171));
+            this.Resources["WarningForeground"]       = new SolidColorBrush(Color.FromRgb(255, 193, 7));
+            Application.Current.Resources["PanelBackground"]  = new SolidColorBrush(Color.FromRgb(45, 45, 45));
+            Application.Current.Resources["TextForeground"]   = new SolidColorBrush(Colors.White);
+            Application.Current.Resources["BorderColor"]      = new SolidColorBrush(Color.FromRgb(60, 60, 60));
             UpdateTitleBarTheme();
         }
 
@@ -240,8 +208,7 @@ namespace StreamTweak
             {
                 var hwnd = new WindowInteropHelper(this).Handle;
                 if (hwnd != IntPtr.Zero)
-                    DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE,
-                        new[] { isDarkMode ? 1 : 0 }, 4);
+                    DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, new[] { 1 }, 4);
             }
             catch { }
         }
@@ -315,7 +282,9 @@ namespace StreamTweak
             UpdateStatusText.Text = string.Empty;
             UpdateStatusText.SetResourceReference(TextBlock.ForegroundProperty, "TextForeground");
             UpdateStatusText.Opacity = 0.7;
-            UpdateLinkText.Visibility = Visibility.Collapsed;
+            UpdateStatusText.FontWeight = FontWeights.Normal;
+            UpdateStatusText.Cursor = System.Windows.Input.Cursors.Arrow;
+            _updateAvailable = false;
             CheckUpdateButton.IsEnabled = true;
         }
 
@@ -323,7 +292,6 @@ namespace StreamTweak
         {
             UpdateStatusText.Text = "Checking for updates…";
             CheckUpdateButton.IsEnabled = false;
-            UpdateLinkText.Visibility = Visibility.Collapsed;
 
             try
             {
@@ -348,9 +316,11 @@ namespace StreamTweak
                     if (latest > currentNorm)
                     {
                         UpdateStatusText.Text = $"⬆ Update available: v{latestStr}";
-                        UpdateStatusText.Foreground = (SolidColorBrush)this.Resources["AccentColor"];
+                        UpdateStatusText.Foreground = new SolidColorBrush(Color.FromRgb(255, 193, 7));
+                        UpdateStatusText.FontWeight = FontWeights.Bold;
                         UpdateStatusText.Opacity = 1.0;
-                        UpdateLinkText.Visibility = Visibility.Visible;
+                        UpdateStatusText.Cursor = System.Windows.Input.Cursors.Hand;
+                        _updateAvailable = true;
                     }
                     else
                     {
@@ -379,8 +349,9 @@ namespace StreamTweak
             await CheckForUpdatesAsync();
         }
 
-        private void UpdateLinkText_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void UpdateStatusText_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
+            if (!_updateAvailable) return;
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
             {
                 FileName = "https://github.com/FoggyBytes/StreamTweak/releases/latest",
@@ -421,12 +392,12 @@ namespace StreamTweak
         {
             try
             {
-                if (!File.Exists(configFilePath)) { ToggleTheme(false); AutoStreamingToggle.IsChecked = true; return; }
+                if (!File.Exists(configFilePath)) { ApplyDarkTheme(); AutoStreamingToggle.IsChecked = true; return; }
 
                 using var doc = JsonDocument.Parse(File.ReadAllText(configFilePath));
                 var root = doc.RootElement;
 
-                ToggleTheme(root.TryGetProperty("IsDarkMode", out var themeEl) && themeEl.GetBoolean());
+                ApplyDarkTheme();
 
                 if (root.TryGetProperty("StreamingMode", out var streamingEl))
                     isStreamingMode = streamingEl.GetBoolean();
@@ -442,7 +413,7 @@ namespace StreamTweak
 
                 AutoStreamingToggle.IsChecked = isAutoStreamingEnabled;
             }
-            catch { ToggleTheme(false); }
+            catch { ApplyDarkTheme(); }
         }
 
         private void SaveConfig(bool saveAdapter)
@@ -453,7 +424,7 @@ namespace StreamTweak
                 var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json)
                            ?? new Dictionary<string, object>();
 
-                data["IsDarkMode"] = isDarkMode;
+                data["IsDarkMode"] = false; // kept for config compatibility
                 if (saveAdapter && AdapterComboBox.SelectedItem is string adapter)
                     data["NetworkAdapterName"] = adapter;
 
@@ -1077,6 +1048,61 @@ namespace StreamTweak
 
                 card.Child = grid;
                 MonitorStackPanel.Children.Add(card);
+            }
+
+            // Placeholder cards for undetected monitor slots (always show up to 3 total)
+            for (int slot = monitors.Count + 1; slot <= 3; slot++)
+            {
+                var placeholder = new Border
+                {
+                    Margin = new Thickness(0, 0, 0, 8),
+                    Padding = new Thickness(12, 10, 12, 10),
+                    CornerRadius = new CornerRadius(6),
+                    BorderThickness = new Thickness(1),
+                    Opacity = 0.5,
+                };
+                placeholder.SetResourceReference(Border.BackgroundProperty, "WindowBackground");
+                placeholder.SetResourceReference(Border.BorderBrushProperty, "BorderColor");
+
+                var pg = new Grid();
+                pg.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                pg.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+                var pLeft = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
+
+                var pName = new TextBlock
+                {
+                    Text = $"Display {slot}",
+                    FontSize = 12,
+                    FontWeight = FontWeights.SemiBold,
+                };
+                pName.SetResourceReference(TextBlock.ForegroundProperty, "TextForeground");
+                pLeft.Children.Add(pName);
+
+                var pStatus = new TextBlock
+                {
+                    Text = "⚠  Not connected",
+                    FontSize = 11,
+                    Foreground = new SolidColorBrush(Color.FromRgb(0xFF, 0xC1, 0x07)),
+                    Margin = new Thickness(0, 3, 0, 0),
+                };
+                pLeft.Children.Add(pStatus);
+
+                Grid.SetColumn(pLeft, 0);
+                pg.Children.Add(pLeft);
+
+                var pToggle = new CheckBox
+                {
+                    Style = (Style)this.Resources["ToggleSwitchStyle"],
+                    IsChecked = false,
+                    IsEnabled = false,
+                    VerticalAlignment = VerticalAlignment.Center,
+                };
+                Grid.SetColumn(pToggle, 1);
+                pg.Children.Add(pToggle);
+
+                placeholder.Child = pg;
+                MonitorStackPanel.Children.Add(placeholder);
             }
         }
 

@@ -39,45 +39,14 @@ StreamTweak works seamlessly with [Moonlight](https://github.com/moonlight-strea
 - **Logs Tab:** Session history for the last 10 speed changes — trigger mode, duration, and original speed recorded automatically.
 - **About Tab:** Version info, GitHub link, license badge, and donation button in a dedicated panel.
 
-## ✨ What's New in Version 3.2.0 — The "Display Update"
+## ✨ What's New in Version 4.0.0 — The "Foundation Update"
 
-- **HDR monitor control:** toggle HDR on or off on any active display directly from the new Display tab — no need to open Windows Settings. Compatible with Windows 10 and all Windows 11 versions including 24H2
-- **Auto HDR toggle:** enable or disable Windows Auto HDR for supported SDR games instantly from the app
-- **Virtual display awareness:** when Apollo or Vibepollo is detected, the Display tab focuses automatically on the virtual display used for the streaming session
+4.0.0 is a new starting point — the visual identity is consolidated and the interface is ready to grow.
 
-<details>
-<summary>Previous highlights — Version 3.1.1 — The "Session Integrity Update"</summary>
-
-- **Session reliability:** fixed sessions remaining stuck as "Active" indefinitely after a restart or crash — orphaned entries are automatically sealed at startup
-- **End reason tracking:** each session now records how it ended — *User* (clean stop), *Disconnected* (connection lost, no reconnect within 30 s), or *Interrupted* (app closed mid-session)
-- **Duration indicators:** ⚡ marks sessions that ended due to a lost connection; — replaces "Active" for sessions interrupted by a restart
-- **Clear Session History:** new button in the Logs tab to wipe the session list in one click; any active session is preserved
-
-</details>
-
-<details>
-<summary>Previous highlights — Version 3.1.0 — The "Atmos Update"</summary>
-
-- **Auto Dolby Atmos for Headphones:** StreamTweak now automatically enables Dolby Atmos for Headphones on Steam Streaming Speakers once a streaming session has been active for 30 continuous seconds — requires [Dolby Access](https://apps.microsoft.com/detail/9n0866fs04w8) installed on the host PC
-- **Dolby Access detection:** the Audio tab displays a live status indicator that confirms whether Dolby Atmos for Headphones is available on the system, checked via the Windows Spatial Audio API at startup and each time the Audio tab is opened
-- **Audio activation status:** the Status box in the Audio tab turns green when Dolby Atmos for Headphones is successfully enabled on Steam Streaming Speakers
-- **Tray Dolby Atmos toggle:** enable or disable Dolby auto-activation directly from the system tray right-click menu, in sync with the Audio tab toggle
-- **Version check:** StreamTweak now compares its current version against the latest GitHub release and shows a direct download link in the About tab when an update is available
-
-</details>
-
-<details>
-<summary>Previous highlights — Version 3.0.0 — The "Awareness Update"</summary>
-
-- **Logs tab:** browse the last 10 speed-change sessions at a glance — trigger mode (Auto/Manual), duration, and original speed are all recorded automatically
-- **Streaming app detection:** the Logs tab shows whether StreamTweak has correctly located the log folder of your streaming server (Sunshine, Apollo, Vibeshine or Vibepollo); click the path to open the folder directly in Explorer
-- **About tab:** version info, link to the GitHub repository, GPL v3 license badge, and PayPal donation button in one dedicated panel
-- **Tray Auto Mode toggle:** enable or disable Auto Streaming Mode directly from the system tray right-click menu — no need to open Settings
-- **Tray speed readout:** the current link speed of the selected adapter is always visible in the tray context menu
-- **Tray streaming status:** the context menu now shows whether a streaming session is currently active or inactive
-- **Full UI revision:** centered layout across all panels, redesigned tab bar with Dark/Light Mode button integrated, improved spacing and visual balance throughout
-
-</details>
+- **Button animations:** all interactive buttons now feature smooth scale animations on hover and a tactile press-down effect on click, bringing the interface closer to a native Windows 11 feel
+- **Selective hover behavior:** primary action buttons (Start/Stop Streaming Mode, Apply Settings, View on GitHub, Donate via PayPal) animate on hover without altering their background color, keeping visual focus on key actions
+- **Unified dark theme:** the StreamingAdjustmentAlert notification window now fully matches the main Settings window dark palette, ensuring visual consistency across all application surfaces
+- **Visual identity:** the accent **#BE5438** — a warm rust tone — is established as the defining color of the StreamTweak interface, consistently applied across all interactive states, panel highlights, and active controls
 
 ## 📖 The Technical Story Behind This Project
 This project was born out of a specific frustration in the cloud gaming community. When using game streaming software like **[Moonlight](https://github.com/moonlight-stream/moonlight-qt)** with **Sunshine** or **Apollo**, a known issue occurs if the host PC and the client have mismatched Ethernet link speeds.
@@ -173,7 +142,7 @@ SpatialAudioDeviceConfiguration.GetForDeviceId(Steam Streaming Speakers)
 
 ## 📝 Installation
 1. Go to the **Releases** page of this repository.
-2. Download the latest `StreamTweak_3.1.1_Installer.exe`
+2. Download the latest `StreamTweak_4.0.0_Installer.exe`
 3. Run the installer and enjoy seamless streaming.
 
 ## 🙏 Support the Project
