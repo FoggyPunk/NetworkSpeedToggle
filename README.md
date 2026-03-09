@@ -165,6 +165,12 @@ LogParser.FindStreamingAppInfo()
 3. Network throttles to 1Gbps immediately — no UAC prompt
 4. Click "Stop Streaming Mode" to restore original speed
 
+### 🖥️ Display & HDR
+1. Open the **Display** tab — all active monitors are listed with name, resolution, refresh rate, and current HDR state
+2. Toggle HDR on or off on any monitor directly from StreamTweak — no need to open Windows Settings; the change takes effect immediately
+3. Enable **Auto HDR** from the same tab to activate Windows Auto HDR for supported SDR games system-wide; the registry change is broadcast instantly to all running applications
+4. When Apollo or Vibepollo is detected as the active streaming server, the tab automatically focuses on the virtual display used for the session (SudoVDA / IDD); if no client is connected yet, all physical displays are shown with a contextual hint to connect Moonlight first
+
 ### 🎧 Auto Dolby Atmos for Headphones
 1. Install [Dolby Access](https://apps.microsoft.com/detail/9n0866fs04w8) on the host PC and enable it at least once
 2. Enable "Auto Dolby Atmos for Headphones" in the Audio tab (or from the tray menu)
