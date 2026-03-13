@@ -51,12 +51,12 @@ StreamLight and StreamTweak are designed to work together, giving you full contr
 
 ## ✨ What's New in Version 4.0.0 — The "Foundation Update"
 
-4.0.0 is a new starting point — the visual identity is consolidated and the interface is ready to grow.
+## ✨ What's New in Version 4.2.0 — The "StreamLight Update"
 
-- **Button animations:** all interactive buttons now feature smooth scale animations on hover and a tactile press-down effect on click, bringing the interface closer to a native Windows 11 feel
-- **Selective hover behavior:** primary action buttons (Start/Stop Streaming Mode, Apply Settings, View on GitHub, Donate via PayPal) animate on hover without altering their background color, keeping visual focus on key actions
-- **Unified dark theme:** the StreamingAdjustmentAlert notification window now fully matches the main Settings window dark palette, ensuring visual consistency across all application surfaces
-- **Visual identity:** the accent **#BE5438** — a warm rust tone — is established as the defining color of the StreamTweak interface, consistently applied across all interactive states, panel highlights, and active controls
+4.2.0 promotes StreamLight integration to stable and finalizes the TCP listener for production use.
+
+* **StreamLight integration (stable):** StreamTweak now fully supports [StreamLight](https://github.com/FoggyBytes/StreamLight) as the companion client; when used in combination with StreamLight on the client side, StreamTweak receives NIC speed adjustment commands directly from the client — allowing the host network to be configured before the streaming session even starts
+* **TCP listener stabilized:** the listener handling incoming commands from StreamLight is now production-ready and fully tested
 
 ## 📖 The Technical Story Behind This Project
 This project was born out of a specific frustration in the cloud gaming community. When using game streaming software like **[Moonlight](https://github.com/moonlight-stream/moonlight-qt)** with **Sunshine** or **Apollo**, a known issue occurs if the host PC and the client have mismatched Ethernet link speeds.
@@ -191,7 +191,7 @@ LogParser.FindStreamingAppInfo()
 
 ## 📝 Installation
 1. Go to the **Releases** page of this repository.
-2. Download the latest `StreamTweak_4.0.0_Installer.exe`
+2. Download the latest `StreamTweak_4.2.0_Installer.exe`
 3. Run the installer and enjoy seamless streaming.
 
 ## 🙏 Support the Project
