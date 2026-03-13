@@ -713,7 +713,7 @@ namespace StreamTweak
                 inactivityTimer.Tick += (s, e) =>
                 {
                     StopInactivityTimer();
-                    DebugLog("Inactivity timer expired — no reconnect detected, ending session as disconnected");
+                    DebugLog("Inactivity timer expired — restoring NIC speed");
                     if (isAutoStreamingActive)
                         HandleAutoStreamStop("Disconnected");
                 };
@@ -781,17 +781,18 @@ namespace StreamTweak
                     ApplySpeed(oneGbpsKey);
                     SaveStreamingStateToConfig(true, originalSpeedForAutoStreaming ?? string.Empty);
                     SessionLogger.StartSession("Bridge", originalSpeedForAutoStreaming ?? string.Empty);
+                    StartInactivityTimer(); // auto-RESTORE if no client connects within 30s
 
                     UpdateTrayMenu();
                     await PollForIconUpdate(false);
 
                     ToastHelper.Show("StreamTweak Ready",
-                        "Network set to 1 Gbps. You can now launch the stream.");
+                        "Network set to 1 Gbps. Connect within 30 seconds or speed will be restored.");
 
                     settingsWindow?.SyncStreamingState(true, originalSpeedForAutoStreaming ?? string.Empty);
                     settingsWindow?.RefreshSessionHistory();
 
-                    DebugLog("Bridge: PREPARE handled — NIC set to 1 Gbps before stream launch");
+                    DebugLog("Bridge: PREPARE handled — NIC set to 1 Gbps, connection timeout started (30s)");
                 }
                 catch (Exception ex)
                 {
