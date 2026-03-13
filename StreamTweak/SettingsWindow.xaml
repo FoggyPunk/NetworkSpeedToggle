@@ -1,16 +1,20 @@
 <Window x:Class="StreamTweak.SettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="StreamTweak" Height="560" Width="650"
+        Title="StreamTweak" Height="580" Width="650"
         WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
-        Background="{DynamicResource WindowBackground}"
+        Background="Transparent"
         Foreground="{DynamicResource TextForeground}"
         FontSize="13"
         FontFamily="Segoe UI">
 
+    <WindowChrome.WindowChrome>
+        <WindowChrome GlassFrameThickness="-1" CaptionHeight="36"/>
+    </WindowChrome.WindowChrome>
+
     <Window.Resources>
-        <SolidColorBrush x:Key="WindowBackground" Color="#FF202020"/>
-        <SolidColorBrush x:Key="PanelBackground" Color="#FF2D2D2D"/>
+        <SolidColorBrush x:Key="WindowBackground" Color="#1A202020"/>
+        <SolidColorBrush x:Key="PanelBackground" Color="#332D2D2D"/>
         <SolidColorBrush x:Key="TextForeground" Color="#FFFFFFFF"/>
         <SolidColorBrush x:Key="BorderColor" Color="#FF3C3C3C"/>
         <SolidColorBrush x:Key="AccentColor" Color="#FFBE5438"/>
@@ -361,10 +365,23 @@
         </Style>
     </Window.Resources>
 
-    <Grid Margin="20,16,20,16">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="36"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Title bar -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="14,0">
+            <Image Source="pack://application:,,,/Resources/streamtweak.ico"
+                   Width="18" Height="18" Margin="0,0,8,0"
+                   RenderOptions.BitmapScalingMode="HighQuality" VerticalAlignment="Center"/>
+            <TextBlock Text="StreamTweak" FontSize="13" FontWeight="SemiBold"
+                       VerticalAlignment="Center" Foreground="{DynamicResource TextForeground}"/>
+        </StackPanel>
 
         <!-- Tab Buttons + Content -->
-        <Grid>
+        <Grid Grid.Row="1" Margin="20,0,20,16">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>

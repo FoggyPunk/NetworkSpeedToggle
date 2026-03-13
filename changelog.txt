@@ -4,6 +4,12 @@ StreamTweak - ChangeLog - Developed by FoggyBytes
 
 https://github.com/FoggyBytes/StreamTweak
 
+Version 4.1.0-pre - The "StreamLight Update" (13/03/2026)
+------------------------------------------
+
+✨ NEW FEATURES:
+• StreamLight integration (experimental): StreamTweak now includes early support for StreamLight, an upcoming Moonlight fork developed by FoggyBytes; when used in combination with StreamLight on the client side, StreamTweak will be able to receive NIC speed adjustment commands directly from the client — allowing the host network to be configured before the streaming session even starts
+
 Version 4.0.0 - The "Foundation Update" (10/03/2026)
 ------------------------------------------
 New starting point — with this release the visual identity of StreamTweak is consolidated and the interface is ready to grow.

@@ -38,6 +38,9 @@ namespace StreamTweak
         private bool _trayAutoHdrEnabled = false;
         private MonitorInfo? _primaryMonitor = null;
 
+        // Moonlight fork TCP bridge
+        private readonly StreamTweakBridge _bridge = new();
+
         // Inactivity timer — prevents restoring speed on temporary reconnect disconnects
         private System.Windows.Threading.DispatcherTimer? inactivityTimer = null;
         private const int INACTIVITY_TIMEOUT_MS = 30000;
@@ -66,6 +69,15 @@ namespace StreamTweak
             _dolbyMonitor.StatusChanged += OnDolbyStatusChanged;
             StartDolbyMonitor();
             _ = InitHdrStateAsync();
+
+            // Start Moonlight fork TCP bridge
+            _bridge.PrepareRequested += OnBridgePrepareRequested;
+            _bridge.RestoreRequested += OnBridgeRestoreRequested;
+            _bridge.Start();
+            _bridge.StatusProvider = () => {
+                var (mbps, connected) = GetCurrentSpeed();
+                return connected ? mbps.ToString() : "UNKNOWN";
+            };
         }
 
         private void LoadConfig()
@@ -536,6 +548,9 @@ namespace StreamTweak
 
         private void MenuExit_Click(object sender, RoutedEventArgs e)
         {
+            _bridge.PrepareRequested -= OnBridgePrepareRequested;
+            _bridge.RestoreRequested -= OnBridgeRestoreRequested;
+            _bridge.Dispose();
             StopLogMonitorForced();
             _dolbyMonitor.Disable();
             tb?.Dispose();
@@ -712,6 +727,92 @@ namespace StreamTweak
         {
             inactivityTimer?.Stop();
             DebugLog("Inactivity timer stopped");
+        }
+
+        #endregion
+
+        #region Moonlight Fork Bridge
+
+        /// <summary>
+        /// Called when Moonlight fork sends PREPARE.
+        /// The user has not launched the stream yet — we set the NIC to 1 Gbps now
+        /// so no disconnect occurs when the session starts.
+        /// </summary>
+        private void OnBridgePrepareRequested()
+        {
+            Application.Current.Dispatcher.Invoke(async () =>
+            {
+                try
+                {
+                    if (isStreamingModeActive) return;
+
+                    var ni = NetworkInterface.GetAllNetworkInterfaces()
+                        .FirstOrDefault(n => n.Name.Equals(adapterName, StringComparison.OrdinalIgnoreCase));
+
+                    if (ni == null || ni.OperationalStatus != OperationalStatus.Up) return;
+
+                    long mbps = ni.Speed / 1_000_000;
+                    if (mbps < 1200) return; // Already at 1 Gbps — nothing to do
+
+                    // Capture original speed
+                    var speeds = NetworkManager.GetSupportedSpeeds(adapterName);
+                    if (speeds != null)
+                    {
+                        foreach (var kvp in speeds)
+                        {
+                            string kl = kvp.Key.ToLower();
+                            bool match = mbps >= 2000
+                                ? kl.Contains("2.5") || kl.Contains("2500")
+                                : kl.Contains(mbps.ToString());
+                            if (match) { originalSpeedForAutoStreaming = kvp.Key; break; }
+                        }
+                    }
+
+                    string? oneGbpsKey = Find1GbpsKey();
+                    if (oneGbpsKey == null) return;
+
+                    // Show alert — user sees it while NIC renegotiates,
+                    // before they launch the stream in Moonlight
+                    var alert = new StreamingAdjustmentAlert();
+                    alert.Show();
+
+                    isAutoStreamingActive = true;
+                    isStreamingModeActive = true;
+                    ApplySpeed(oneGbpsKey);
+                    SaveStreamingStateToConfig(true, originalSpeedForAutoStreaming ?? string.Empty);
+                    SessionLogger.StartSession("Bridge", originalSpeedForAutoStreaming ?? string.Empty);
+
+                    UpdateTrayMenu();
+                    await PollForIconUpdate(false);
+
+                    ToastHelper.Show("StreamTweak Ready",
+                        "Network set to 1 Gbps. You can now launch the stream.");
+
+                    settingsWindow?.SyncStreamingState(true, originalSpeedForAutoStreaming ?? string.Empty);
+                    settingsWindow?.RefreshSessionHistory();
+
+                    DebugLog("Bridge: PREPARE handled — NIC set to 1 Gbps before stream launch");
+                }
+                catch (Exception ex)
+                {
+                    DebugLog($"Bridge: PREPARE error — {ex.Message}");
+                }
+            });
+        }
+
+        /// <summary>
+        /// Called when Moonlight fork sends RESTORE after session ends.
+        /// Acts as an explicit fallback alongside the log monitor.
+        /// If the log monitor already restored the speed, this is a no-op.
+        /// </summary>
+        private void OnBridgeRestoreRequested()
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                DebugLog("Bridge: RESTORE received");
+                if (isAutoStreamingActive)
+                    HandleAutoStreamStop("User");
+            });
         }
 
         #endregion

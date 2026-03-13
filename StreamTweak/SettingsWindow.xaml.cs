@@ -20,7 +20,10 @@ namespace StreamTweak
     {
         [DllImport("DwmApi")]
         private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, int[] attrValue, int attrSize);
-        private const int DWMWA_USE_IMMERSIVE_DARK_MODE = 20;
+        private const int DWMWA_USE_IMMERSIVE_DARK_MODE  = 20;
+        private const int DWMWA_SYSTEMBACKDROP_TYPE       = 38;
+        private const int DWMSBT_MICA                     = 2;
+        private const int DWMSBT_MICA_ALT                 = 4;
 
         private readonly string configFilePath;
         private Dictionary<string, string>? currentAdapterSpeeds;
@@ -63,7 +66,10 @@ namespace StreamTweak
             this.SourceInitialized += (_, _) =>
             {
                 UpdateTitleBarTheme();
+                ApplyBackdrop();
                 var hwndSource = HwndSource.FromHwnd(new WindowInteropHelper(this).Handle);
+                if (hwndSource != null)
+                    hwndSource.CompositionTarget.BackgroundColor = Colors.Transparent;
                 hwndSource?.AddHook(WndProc);
             };
 
@@ -190,13 +196,13 @@ namespace StreamTweak
 
         private void ApplyDarkTheme()
         {
-            this.Resources["WindowBackground"]        = new SolidColorBrush(Color.FromRgb(32, 32, 32));
-            this.Resources["PanelBackground"]         = new SolidColorBrush(Color.FromRgb(45, 45, 45));
+            this.Resources["WindowBackground"]        = new SolidColorBrush(Color.FromArgb(0x1A, 32, 32, 32));
+            this.Resources["PanelBackground"]         = new SolidColorBrush(Color.FromArgb(0x33, 45, 45, 45));
             this.Resources["TextForeground"]          = new SolidColorBrush(Colors.White);
             this.Resources["BorderColor"]             = new SolidColorBrush(Color.FromRgb(60, 60, 60));
             this.Resources["SecondaryTextForeground"] = new SolidColorBrush(Color.FromRgb(171, 171, 171));
             this.Resources["WarningForeground"]       = new SolidColorBrush(Color.FromRgb(255, 193, 7));
-            Application.Current.Resources["PanelBackground"]  = new SolidColorBrush(Color.FromRgb(45, 45, 45));
+            Application.Current.Resources["PanelBackground"]  = new SolidColorBrush(Color.FromArgb(0x33, 45, 45, 45));
             Application.Current.Resources["TextForeground"]   = new SolidColorBrush(Colors.White);
             Application.Current.Resources["BorderColor"]      = new SolidColorBrush(Color.FromRgb(60, 60, 60));
             UpdateTitleBarTheme();
@@ -209,6 +215,22 @@ namespace StreamTweak
                 var hwnd = new WindowInteropHelper(this).Handle;
                 if (hwnd != IntPtr.Zero)
                     DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, new[] { 1 }, 4);
+            }
+            catch { }
+        }
+
+        private void ApplyBackdrop()
+        {
+            try
+            {
+                var hwnd = new WindowInteropHelper(this).Handle;
+                if (hwnd == IntPtr.Zero) return;
+                int build = Environment.OSVersion.Version.Build;
+                if (build >= 22000)
+                {
+                    int type = build >= 22621 ? DWMSBT_MICA_ALT : DWMSBT_MICA;
+                    DwmSetWindowAttribute(hwnd, DWMWA_SYSTEMBACKDROP_TYPE, new[] { type }, 4);
+                }
             }
             catch { }
         }
@@ -424,7 +446,6 @@ namespace StreamTweak
                 var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json)
                            ?? new Dictionary<string, object>();
 
-                data["IsDarkMode"] = false; // kept for config compatibility
                 if (saveAdapter && AdapterComboBox.SelectedItem is string adapter)
                     data["NetworkAdapterName"] = adapter;
 
@@ -1183,8 +1204,17 @@ namespace StreamTweak
         private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
             const int WM_DISPLAYCHANGE = 0x007E;
+            const int WM_NCACTIVATE    = 0x0086;
+
             if (msg == WM_DISPLAYCHANGE && DisplayPanel.Visibility == Visibility.Visible)
                 RefreshDisplayPanelAsync();
+
+            if (msg == WM_NCACTIVATE)
+            {
+                handled = true;
+                return new IntPtr(1);
+            }
+
             return IntPtr.Zero;
         }
 
