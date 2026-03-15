@@ -1071,61 +1071,7 @@ namespace StreamTweak
                 MonitorStackPanel.Children.Add(card);
             }
 
-            // Placeholder cards for undetected monitor slots (always show up to 3 total)
-            for (int slot = monitors.Count + 1; slot <= 3; slot++)
-            {
-                var placeholder = new Border
-                {
-                    Margin = new Thickness(0, 0, 0, 8),
-                    Padding = new Thickness(12, 10, 12, 10),
-                    CornerRadius = new CornerRadius(6),
-                    BorderThickness = new Thickness(1),
-                    Opacity = 0.5,
-                };
-                placeholder.SetResourceReference(Border.BackgroundProperty, "WindowBackground");
-                placeholder.SetResourceReference(Border.BorderBrushProperty, "BorderColor");
-
-                var pg = new Grid();
-                pg.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-                pg.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-
-                var pLeft = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
-
-                var pName = new TextBlock
-                {
-                    Text = $"Display {slot}",
-                    FontSize = 12,
-                    FontWeight = FontWeights.SemiBold,
-                };
-                pName.SetResourceReference(TextBlock.ForegroundProperty, "TextForeground");
-                pLeft.Children.Add(pName);
-
-                var pStatus = new TextBlock
-                {
-                    Text = "⚠  Not connected",
-                    FontSize = 11,
-                    Foreground = new SolidColorBrush(Color.FromRgb(0xFF, 0xC1, 0x07)),
-                    Margin = new Thickness(0, 3, 0, 0),
-                };
-                pLeft.Children.Add(pStatus);
-
-                Grid.SetColumn(pLeft, 0);
-                pg.Children.Add(pLeft);
-
-                var pToggle = new CheckBox
-                {
-                    Style = (Style)this.Resources["ToggleSwitchStyle"],
-                    IsChecked = false,
-                    IsEnabled = false,
-                    VerticalAlignment = VerticalAlignment.Center,
-                };
-                Grid.SetColumn(pToggle, 1);
-                pg.Children.Add(pToggle);
-
-                placeholder.Child = pg;
-                MonitorStackPanel.Children.Add(placeholder);
             }
-        }
 
         // ─── HDR toggle handler ───────────────────────────────────────────────────────
 

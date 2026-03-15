@@ -4,6 +4,17 @@ StreamTweak - ChangeLog - Developed by FoggyBytes
 
 https://github.com/FoggyBytes/StreamTweak
 
+Version 4.2.1 - The "Reliability Update" (15/03/2026)
+------------------------------------------
+
+🐛 STABILITY & FIXES:
+• Fixed Auto Streaming Mode toggle being ignored on new client connections: when the toggle was disabled, the TCP bridge handler (PREPARE command from the StreamLight client) still triggered a NIC speed change because it did not check the Auto Mode state; the speed change is now fully blocked when Auto Mode is off
+• Fixed Auto Streaming Mode toggle being ignored via log-monitor path: HandleAutoStreamStart() also lacked the Auto Mode guard, meaning a stream-start log event could still change the NIC speed — particularly when Dolby monitoring was active and kept the log monitor running; both entry points now respect the toggle
+• Fixed race condition in auto stream start: if the user disabled Auto Mode during the 7.9-second countdown alert, the speed change was still applied after the delay; the toggle state is now re-checked immediately after the countdown before any speed command is sent
+
+🔧 IMPROVEMENTS:
+• Display tab: removed placeholder cards for disconnected monitors (Display 2, Display 3); the panel now only shows monitors that are actually connected, keeping the Display section clean on single-monitor setups
+
 Version 4.2.0 - The "StreamLight Update" (13/03/2026)
 ------------------------------------------
 

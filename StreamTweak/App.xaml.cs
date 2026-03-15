@@ -623,6 +623,7 @@ namespace StreamTweak
         {
             try
             {
+                if (!isAutoStreamingEnabled) return;
                 if (isStreamingModeActive) return;
 
                 var ni = NetworkInterface.GetAllNetworkInterfaces()
@@ -653,6 +654,8 @@ namespace StreamTweak
                 var alert = new StreamingAdjustmentAlert();
                 alert.Show();
                 await Task.Delay(7900);
+
+                if (!isAutoStreamingEnabled) { alert.Close(); return; }
 
                 isAutoStreamingActive = true;
                 isStreamingModeActive = true;
@@ -744,6 +747,7 @@ namespace StreamTweak
             {
                 try
                 {
+                    if (!isAutoStreamingEnabled) return;
                     if (isStreamingModeActive) return;
 
                     var ni = NetworkInterface.GetAllNetworkInterfaces()

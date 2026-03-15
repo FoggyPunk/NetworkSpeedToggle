@@ -49,12 +49,14 @@ StreamLight and StreamTweak are designed to work together, giving you full contr
 - **Logs Tab:** Session history for the last 10 speed changes — trigger mode, duration, and original speed recorded automatically.
 - **About Tab:** Version info, GitHub link, license badge, and donation button in a dedicated panel.
 
-## ✨ What's New in Version 4.2.0 — The "StreamLight Update"
+## ✨ What's New in Version 4.2.1 — The "Reliability Update"
 
-4.2.0 promotes StreamLight integration to stable and finalizes the TCP listener for production use.
+4.2.1 is a focused patch that closes three behavioural bugs around Auto Streaming Mode and cleans up the Display tab.
 
-* **StreamLight integration (stable):** StreamTweak now fully supports [StreamLight](https://github.com/FoggyBytes/StreamLight) as the companion client; when used in combination with StreamLight on the client side, StreamTweak receives NIC speed adjustment commands directly from the client — allowing the host network to be configured before the streaming session even starts
-* **TCP listener stabilized:** the listener handling incoming commands from StreamLight is now production-ready and fully tested
+* **Fixed: Auto Mode toggle ignored on new client connections —** when Auto Streaming Mode was disabled, the TCP bridge handler (`PREPARE` command from [StreamLight](https://github.com/FoggyBytes/StreamLight)) still triggered a NIC speed change because it did not check the Auto Mode state; the speed change is now fully blocked when Auto Mode is off
+* **Fixed: Auto Mode toggle ignored via log-monitor path —** `HandleAutoStreamStart()` also lacked the Auto Mode guard, meaning a stream-start log event could still change the NIC speed — particularly when Dolby monitoring was active and kept the log monitor running; both entry points now respect the toggle
+* **Fixed: race condition in auto stream start —** if the user disabled Auto Mode during the 7.9-second countdown alert, the speed change was still applied after the delay; the toggle state is now re-checked immediately after the countdown before any speed command is sent
+* **Display tab — cleaner monitor list:** placeholder cards for disconnected slots (Display 2, Display 3) have been removed; the panel now only shows monitors that are actually connected
 
 ## 📖 The Technical Story Behind This Project
 This project was born out of a specific frustration in the cloud gaming community. When using game streaming software like **[Moonlight](https://github.com/moonlight-stream/moonlight-qt)** with **Sunshine** or **Apollo**, a known issue occurs if the host PC and the client have mismatched Ethernet link speeds.
@@ -189,7 +191,7 @@ LogParser.FindStreamingAppInfo()
 
 ## 📝 Installation
 1. Go to the **Releases** page of this repository.
-2. Download the latest `StreamTweak_4.2.0_Installer.exe`
+2. Download the latest `StreamTweak_4.2.1_Installer.exe`
 3. Run the installer and enjoy seamless streaming.
 
 ## 🙏 Support the Project
